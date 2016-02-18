@@ -24,7 +24,7 @@ CONTENTS OF THIS FILE
 
 Introduction
 
-Acad-Hub(tentative) is a mulitpurpose all in one software desigend to take care 
+Acad-Hub(tentative) is a mulitpurpose all in one software designed to take care 
 of all your semester's academic and admistration related common needs. 
 
 It gives you important information like semester courses, the professors, the 
