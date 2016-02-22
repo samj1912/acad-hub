@@ -1,7 +1,22 @@
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject
 from webcrawler import showBooks
+from time import gmtime, strftime
 
 
+
+def semFinder(roll):
+    a=str(roll)
+    year=a[0:2]
+    m=strftime("%m", gmtime())
+    y=strftime("%y", gmtime())
+    ans = ((float(m)-1)/12)+int(y)-int(year)
+    return int(ans*2)
+def depFinder(roll):
+
+    a=str(roll)
+    dep=a[4:6]
+    deps={"01":"CSE","02":"ECE","03":"ME","04":"CE","06":"BT","07":"CL","08":"EEE","21":"EPh","22":"CST","23":"MC"}
+    return deps[dep]
 
 def displayResult(dept, sem):
 	win = TreeViewWindow(dept,sem)
@@ -35,55 +50,33 @@ class ComboBoxWindow(Gtk.Window):
 
     def __init__(self):
         Gtk.Window.__init__(self, title="SemBegins!")
+        self.set_size_request(200, 100)
+
+        self.timeout_id = None
+
 
         self.set_border_width(10)		
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-        
+        label = Gtk.Label("Enter Your Roll Number:")
+        vbox.pack_start(label, True, True, 0)
+                        
         self.dept = "CSE"
         self.sem = "3"
-
-        deptbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        label = Gtk.Label("Choose Department: ")
-        depts = ["CSE", "ECE", "EEE", "ME", "CE", "BT", "CL", "EPh", "CST", "MC"]
-        dept_combo = Gtk.ComboBoxText()
-        dept_combo.set_entry_text_column(0)
-        dept_combo.connect("changed", self.on_dept_combo_changed)
-        for dept in depts	:
-            dept_combo.append_text(dept)
-        dept_combo.set_active(0)
-        deptbox.pack_start(label, False, False, 0)
-        deptbox.pack_start(dept_combo, False, False, 0)
-        vbox.pack_start(deptbox, False, False, 0)
-
-        sembox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        label = Gtk.Label("Choose Semester: ")
-        sem_combo = Gtk.ComboBoxText()
-        sem_combo.set_entry_text_column(0)
-        sem_combo.connect("changed", self.on_sem_combo_changed)
-        for i in range(1,9)	:
-            sem_combo.append_text("Semester " + str(i))
-        sem_combo.set_active(2)
-        sembox.pack_start(label, False, False, 0)
-        sembox.pack_start(sem_combo, False, False, 0)
-        vbox.pack_start(sembox, False, False, 0)
+        self.entry = Gtk.Entry()
+        self.entry.set_max_length(9)
+        self.entry.set_text("140101063")
+        vbox.pack_start(self.entry, True, True, 0)
 
         button = Gtk.Button(label="Submit")
         button.connect("clicked", self.buttonClicked)
         vbox.pack_start(button, False, False, 0)
         self.add(vbox)
 
-    def on_dept_combo_changed(self, combo):
-        text = combo.get_active_text()
-        if text != None:
-        	self.dept = text
-
-    def on_sem_combo_changed(self, combo):
-        text = combo.get_active_text()
-        if text != None:
-        	self.sem = text[len(text)-1]
-
     def buttonClicked(self, widget):
+        self.roll=self.entry.get_text()
+        self.sem=semFinder(self.roll)
+        self.dept=depFinder(self.roll)
     	displayResult(self.dept, self.sem)
 
 win = ComboBoxWindow()

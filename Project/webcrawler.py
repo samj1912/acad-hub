@@ -84,7 +84,7 @@ def showBooks(dept, sem):
 	source_code = requests.get(url)
 	plain_text = source_code.text
 
-	soup = BeautifulSoup(plain_text)
+	soup = BeautifulSoup(plain_text,"lxml")
 
 	table = soup.find('table', {'class':'MsoNormalTable'})
 	rows = table.findAll('tr')
