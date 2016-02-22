@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+from libSearch import libgenSearch
+import string 
 
 def stripAll(text):
 	strippedText = ''.join(text.split())
@@ -7,6 +9,11 @@ def stripAll(text):
 
 def splitAndJoin(text):
 	return " ".join(text.split()).rstrip().lstrip()
+
+def removePunc(text):
+	for c in string.punctuation:
+		text = text.replace(c, "")
+	return text.replace("and", "")
 
 def getBooks(row):
 	para = row.findAll('p')
@@ -70,10 +77,11 @@ def getCourseBooks(courses, soup):
 					author = row[3:pos-2]
 					pub = row[pos+len(title)+1:]
 					# print title + "\t" + author + "\t" + pub
-
-					courseBooks.append((course, courses[course]["code"], title, author, pub))
+					downloadLink = libgenSearch([removePunc(title), removePunc(author)])
+					courseBooks.append((course, courses[course]["code"], title, author, pub, downloadLink))
 				 
 				break
+	print courseBooks
 	return courseBooks
 
 

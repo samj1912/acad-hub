@@ -32,13 +32,13 @@ class TreeViewWindow(Gtk.Window):
         courseBooks = showBooks(dept, sem)
         layout = Gtk.Box()
         self.add(layout)
-        books_list_store = Gtk.ListStore(str, str, str, str, str)
+        books_list_store = Gtk.ListStore(str, str, str, str, str, str)
         for book in courseBooks:
             books_list_store.append(list(book))
 
         books_tree_view = Gtk.TreeView(books_list_store)
 
-        for i, col_title in enumerate(["Course", "code", "Title", "Author", "Publications/Edition"]):
+        for i, col_title in enumerate(["Course", "code", "Title", "Author", "Publications/Edition", "Download link"]):
             renderer = Gtk.CellRendererText()
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
             books_tree_view.append_column(column)
