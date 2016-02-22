@@ -10,6 +10,9 @@ def stripAll(text):
 def splitAndJoin(text):
 	return " ".join(text.split()).rstrip().lstrip()
 
+def removeSpaces(text):
+	return "".join(text.split()).rstrip().lstrip()
+
 def getDate(rows,j):
 	ans=rows[j].find('td')
 	b=splitAndJoin(ans.text)
@@ -34,7 +37,7 @@ def getRoom(course,rows,i):
 		if course in text:
 			start=text.index('(',text.index(course)+ len(course)-1)
 			end=text.index(')',text.index(course)+ len(course)-1)
-			return text[start:end+1]
+			return text[start+1:end]
 
 
 
@@ -63,8 +66,8 @@ def examtt(courses):
 
 	for i in range(len(date)):
 		print sortcourse[i]
-		print date[i]
-		print rooms[i]
+		print removeSpaces(date[i])
+		print removeSpaces(rooms[i])
 
 
 
