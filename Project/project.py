@@ -19,32 +19,75 @@ def depFinder(roll):
     return deps[dep]
 
 def displayResult(dept, sem):
-	win = TreeViewWindow(dept,sem)
+	win = MyWindow(dept,sem)
 	win.connect("delete-event", Gtk.main_quit)
 	win.show_all()
 	Gtk.main()
 
 
-class TreeViewWindow(Gtk.Window):
+# class TreeViewWindow(Gtk.Window):
     
-    def __init__(self, dept="CE", sem=3):
-        Gtk.Window.__init__(self, title="Course Books")
+#     def __init__(self, dept="CE", sem=3):
+#         Gtk.Window.__init__(self, title="Course Books")
+#         courseBooks = showBooks(dept, sem)
+#         layout = Gtk.Box()
+#         self.add(layout)
+#         books_list_store = Gtk.ListStore(str, str, str, str, str, str)
+#         for book in courseBooks:
+#             books_list_store.append(list(book))
+
+#         books_tree_view = Gtk.TreeView(books_list_store)
+
+#         for i, col_title in enumerate(["Course", "code", "Title", "Author", "Publications/Edition", "Download link"]):
+#             renderer = Gtk.CellRendererText()
+#             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
+#             books_tree_view.append_column(column)
+
+#         layout.pack_start(books_tree_view, True, True, 0)
+
+class MyWindow(Gtk.Window):
+
+    def __init__(self,dept="CSE",sem=3):
+        Gtk.Window.__init__(self, title="Acad-Hub")
+        self.set_border_width(3)
+
+        self.notebook = Gtk.Notebook()
+        self.add(self.notebook)
+
         courseBooks = showBooks(dept, sem)
-        layout = Gtk.Box()
-        self.add(layout)
+        self.page1 = Gtk.Box()
+        self.page1.set_border_width(10)
         books_list_store = Gtk.ListStore(str, str, str, str, str, str)
         for book in courseBooks:
             books_list_store.append(list(book))
 
         books_tree_view = Gtk.TreeView(books_list_store)
 
-        for i, col_title in enumerate(["Course", "code", "Title", "Author", "Publications/Edition", "Download link"]):
+        for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Download link"]):
             renderer = Gtk.CellRendererText()
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
             books_tree_view.append_column(column)
 
-        layout.pack_start(books_tree_view, True, True, 0)
+        self.page1.pack_start(books_tree_view, True, True, 0)
 
+
+        self.notebook.append_page(self.page1, Gtk.Label('Course Info'))
+
+        self.page2 = Gtk.Box()
+        self.page2.set_border_width(10)
+        self.page2.add(Gtk.Label('A page with an image for a Title.'))
+        self.notebook.append_page(
+            self.page2,
+            Gtk.Image.new_from_icon_name(
+                "help-about",
+                Gtk.IconSize.MENU
+            )
+        )
+
+# win = MyWindow()
+# win.connect("delete-event", Gtk.main_quit)
+# win.show_all()
+# Gtk.main()
 
 class ComboBoxWindow(Gtk.Window):
 
@@ -77,7 +120,8 @@ class ComboBoxWindow(Gtk.Window):
         self.roll=self.entry.get_text()
         self.sem=semFinder(self.roll)
         self.dept=depFinder(self.roll)
-    	displayResult(self.dept, self.sem)
+        displayResult(self.dept, self.sem)
+        self.destroy()
 
 win = ComboBoxWindow()
 win.connect("delete-event", Gtk.main_quit)
