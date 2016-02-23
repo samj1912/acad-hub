@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from libSearch import libgenSearch
+from libSearch import libgenSearch, librarySearch
 import string 
 
 def stripAll(text):
@@ -12,8 +12,19 @@ def splitAndJoin(text):
 
 def removePunc(text):
 	for c in string.punctuation:
-		text = text.replace(c, "")
-	return text.replace("and", "")
+		if c is not '.':
+			text = text.replace(c, "")
+	return text.replace(" and ", " ")
+
+def getFirstAuthor(text):
+	if "," in text:
+		authors = text.split(",")
+	elif " and " in text:
+		authors = text.split(" and ")
+	else:
+		return splitAndJoin(text)
+	return splitAndJoin(authors[0])
+
 
 def getBooks(row):
 	para = row.findAll('p')
@@ -70,15 +81,16 @@ def getCourseBooks(courses, soup):
 					except:
 						continue
 					title = splitAndJoin(title)
-
-					row = splitAndJoin(book.text)
+					row = ".".join(book.text.split(".")[1:])
+					row = splitAndJoin(row)
 					pos = row.find(title)
-
-					author = row[3:pos-2]
+					author = row[:pos-2]
 					pub = row[pos+len(title)+1:]
 					# print title + "\t" + author + "\t" + pub
 					downloadLink = libgenSearch([removePunc(title), removePunc(author)])
-					courseBooks.append((course, courses[course]["code"], title, author, pub, downloadLink))
+					libraryInfo = librarySearch([removePunc(title), getFirstAuthor(author)])
+					# print [removePunc(title), getFirstAuthor(author)]
+					courseBooks.append((course, courses[course]["code"], title, author, pub, libraryInfo, downloadLink))
 				 
 				break
 	# print courseBooks
