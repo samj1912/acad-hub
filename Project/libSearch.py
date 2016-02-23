@@ -9,18 +9,18 @@ def libgenSearch(book):
 	source_code = requests.get(url)
 	plain_text = source_code.text
 
-	soup = bs(plain_text)
+	soup = bs(plain_text, "lxml")
 	table = soup.find('table', {'class':'c'})
 	link = table.find('a', {'id':1})
 	if link is None:
 		return "None"
 
 	url = "http://gen.lib.rus.ec/"+link['href']
-	soup = bs(requests.get(url).text)
+	soup = bs(requests.get(url).text, "lxml")
 	table = soup.find('table')
 	link = table.find('a')
 	
-	soup = bs(requests.get(link['href']).text)
+	soup = bs(requests.get(link['href']).text,"lxml")
 	table = soup.find('table')
 	link = table.find('a')
 	return "http://libgen.io"+link['href']
@@ -35,7 +35,7 @@ def librarySearch(book):
 	source_code = requests.get(url)
 	plain_text = source_code.text
 
-	soup = bs(plain_text)
+	soup = bs(plain_text,"lxml")
 
 	# br.open(url)
 
