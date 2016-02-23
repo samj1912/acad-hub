@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from webcrawler import showBooks
+from webcrawler import showCourses
 
 
 
@@ -75,13 +75,16 @@ def examtt(courses):
 
 
 def listTT(dept,sem):
-	course = showBooks(dept, sem)
+	courses = showCourses(dept, sem)
 	coursecodes = []
-	for code in course:
-		depc = code[1][0:2]
-		ccode = code[1][2:]
+	for course in courses:
+		# print course
+		code=course[0]
+		depc = code[0:2]
+		ccode = code[2:]
 		finalc = depc+" "+ccode	
-		coursecodes.append(finalc)
+		if finalc != " ":
+			coursecodes.append(finalc)
 	coursecodes=list(set(coursecodes))
 
 
@@ -89,6 +92,6 @@ def listTT(dept,sem):
 	return examtt(coursecodes)	
 
 
-# listTT("CSE",4)
+# print listTT("CSE",4)
 
 # examtt(['CS 201','CS 202','EE 230','CS 204'])

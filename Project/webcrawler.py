@@ -85,6 +85,50 @@ def getCourseBooks(courses, soup):
 	return courseBooks
 
 
+def showCourses(dept,sem):
+	sem = int(sem)
+	url = "http://shilloi.iitg.ernet.in/~acad/intranet/CourseStructure/"+dept.lower()+"UG2013onwards.htm"
+	source_code = requests.get(url)
+	plain_text = source_code.text
+
+	soup = BeautifulSoup(plain_text, "lxml")
+
+	table = soup.find('table', {'class':'MsoNormalTable'})
+	rows = table.findAll('tr')
+	semTitleRows=[]
+	for i in range(len(rows)):
+		text = rows[i].text
+		if "Semester" in text:
+			semTitleRows.append(i)
+			continue
+	semTitleRows.append(len(rows))
+	
+	rowSemEquivalent = sem/2 - (sem+1)%2
+
+	courses = []
+
+
+	for i in range(semTitleRows[rowSemEquivalent]+1, semTitleRows[rowSemEquivalent+1]-1):
+		td = rows[i].findAll('td')
+		info = []
+		if sem%2 == 1:
+			if stripAll(td[0].text) == "" and stripAll(td[1].text) == "":
+				continue
+			for j in range(0,6):
+				strippedText = splitAndJoin(td[j].text)
+				info.append(str(strippedText))
+		else:
+			if len(td)<=8 or stripAll(td[7].text) == "" and stripAll(td[8].text) == "":
+				continue
+			for j in range(7,len(td)):
+				strippedText = splitAndJoin(td[j].text)
+				info.append(str(strippedText))
+
+		info[0] = stripAll(info[0])
+		# print info
+		courses.append(info)
+	return courses	
+
 
 def showBooks(dept, sem):
 	sem = int(sem)
@@ -126,7 +170,7 @@ def showBooks(dept, sem):
 
 		info[0] = stripAll(info[0])
 		# print info
-		courses[info[1]] = {"code":info[0], "L":info[2], "T":info[3], "P":info[4], "C":info[5],}
+		courses[info[1]] = {"code":info[0], "L":info[2], "T":info[3], "P":info[4], "C":info[5]}
 
 	return getCourseBooks(courses, soup)
 

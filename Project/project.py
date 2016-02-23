@@ -1,5 +1,5 @@
 from gi.repository import Gtk, GObject
-from webcrawler import showBooks
+from webcrawler import showBooks, showCourses 
 from time import gmtime, strftime
 from exam import listTT
 
@@ -72,7 +72,7 @@ class MyWindow(Gtk.Window):
         self.page1.pack_start(books_tree_view, True, True, 0)
 
 
-        self.notebook.append_page(self.page1, Gtk.Label('Course Info'))
+        self.notebook.append_page(self.page1, Gtk.Label('Books Info'))
 
         self.page2 = Gtk.Box()
         self.page2.set_border_width(10)
@@ -92,6 +92,27 @@ class MyWindow(Gtk.Window):
 
 
         self.notebook.append_page(self.page2, Gtk.Label('Exam Time Table'))
+
+
+        self.page3 = Gtk.Box()
+        self.page3.set_border_width(10)
+        courses= showCourses(dept,sem)
+        course_list_store = Gtk.ListStore(str, str, str, str, str , str)
+        for course in courses:
+            course_list_store.append(list(course))
+
+        course_tree_view = Gtk.TreeView(course_list_store)
+
+        for i, col_title in enumerate(["Course-Code", "Course Name", "L", "T", "P" , "C"]):
+            renderer = Gtk.CellRendererText()
+            column = Gtk.TreeViewColumn(col_title, renderer, text=i)
+            course_tree_view.append_column(column)
+
+        self.page3.pack_start(course_tree_view, True, True, 0)
+
+
+        self.notebook.append_page(self.page3, Gtk.Label('Course Information'))
+
 
 # win = MyWindow()
 # win.connect("delete-event", Gtk.main_quit)
@@ -129,8 +150,8 @@ class ComboBoxWindow(Gtk.Window):
         self.roll=self.entry.get_text()
         self.sem=semFinder(self.roll)
         self.dept=depFinder(self.roll)
+        # self.destroy()
         displayResult(self.dept, self.sem)
-        self.destroy()
 
 win = ComboBoxWindow()
 win.connect("delete-event", Gtk.main_quit)
