@@ -1,7 +1,7 @@
 from gi.repository import Gtk, GObject
 from webcrawler import showBooks
 from time import gmtime, strftime
-
+from exam import listTT
 
 
 def semFinder(roll):
@@ -11,6 +11,7 @@ def semFinder(roll):
     y=strftime("%y", gmtime())
     ans = ((float(m)-1)/12)+int(y)-int(year)
     return int(ans*2)
+
 def depFinder(roll):
 
     a=str(roll)
@@ -75,14 +76,22 @@ class MyWindow(Gtk.Window):
 
         self.page2 = Gtk.Box()
         self.page2.set_border_width(10)
-        self.page2.add(Gtk.Label('A page with an image for a Title.'))
-        self.notebook.append_page(
-            self.page2,
-            Gtk.Image.new_from_icon_name(
-                "help-about",
-                Gtk.IconSize.MENU
-            )
-        )
+        examtt= listTT(dept,sem)
+        exams_list_store = Gtk.ListStore(str, str, str)
+        for exam in examtt:
+            exams_list_store.append(list(exam))
+
+        exams_tree_view = Gtk.TreeView(exams_list_store)
+
+        for i, col_title in enumerate(["Course", "Date", "Venue"]):
+            renderer = Gtk.CellRendererText()
+            column = Gtk.TreeViewColumn(col_title, renderer, text=i)
+            exams_tree_view.append_column(column)
+
+        self.page2.pack_start(exams_tree_view, True, True, 0)
+
+
+        self.notebook.append_page(self.page2, Gtk.Label('Exam Time Table'))
 
 # win = MyWindow()
 # win.connect("delete-event", Gtk.main_quit)

@@ -81,7 +81,7 @@ def getCourseBooks(courses, soup):
 					courseBooks.append((course, courses[course]["code"], title, author, pub, downloadLink))
 				 
 				break
-	print courseBooks
+	# print courseBooks
 	return courseBooks
 
 
@@ -92,7 +92,7 @@ def showBooks(dept, sem):
 	source_code = requests.get(url)
 	plain_text = source_code.text
 
-	soup = BeautifulSoup(plain_text,"lxml")
+	soup = BeautifulSoup(plain_text, "lxml")
 
 	table = soup.find('table', {'class':'MsoNormalTable'})
 	rows = table.findAll('tr')

@@ -1,5 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
+from webcrawler import showBooks
+
+
 
 
 
@@ -63,13 +66,29 @@ def examtt(courses):
 					sortcourse.append(courses[j])
 					break
 				
-
+	listarr = []				
 	for i in range(len(date)):
-		print sortcourse[i]
-		print removeSpaces(date[i])
-		print removeSpaces(rooms[i])
+		item = [sortcourse[i] ,removeSpaces(date[i]) ,removeSpaces(rooms[i])]
+		listarr.append(item)
+	return listarr	
 
 
 
+def listTT(dept,sem):
+	course = showBooks(dept, sem)
+	coursecodes = []
+	for code in course:
+		depc = code[1][0:2]
+		ccode = code[1][2:]
+		finalc = depc+" "+ccode	
+		coursecodes.append(finalc)
+	coursecodes=list(set(coursecodes))
 
-examtt(["EE 230","CS 222","HS 226", "DD 529"])
+
+	# print coursecodes
+	return examtt(coursecodes)	
+
+
+# listTT("CSE",4)
+
+# examtt(['CS 201','CS 202','EE 230','CS 204'])
