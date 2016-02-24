@@ -5,6 +5,7 @@ def splitAndJoin(text):
 	return " ".join(text.split()).rstrip().lstrip()
 
 def libgenSearch(book):
+	return "None"
 	name = book[0]
 	author = book[1]
 	url = "http://gen.lib.rus.ec/search.php?req="+name+" "+author+"&open=0&view=simple&phrase=1&column=def"

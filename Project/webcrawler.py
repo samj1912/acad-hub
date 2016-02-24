@@ -19,11 +19,19 @@ def removePunc(text):
 def getFirstAuthor(text):
 	if "," in text:
 		authors = text.split(",")
+		author = splitAndJoin(authors[0])
 	elif " and " in text:
 		authors = text.split(" and ")
+		author = splitAndJoin(authors[0])
 	else:
-		return splitAndJoin(text)
-	return splitAndJoin(authors[0])
+		author = splitAndJoin(text)
+	author = author.replace(".", " ")
+	temp = author.split()
+	temp2 = []
+	for word in temp:
+		if len(word) > 1:
+			temp2.append(word)
+	return " ".join(temp2)
 
 
 def getBooks(row):
