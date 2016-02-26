@@ -58,13 +58,13 @@ class MainNotebook(Gtk.Window):
         self.page2 = Gtk.Box()
         self.page2.set_border_width(10)
         examtt= listTT(dept,sem) #fetching exam time table array
-        exams_list_store = Gtk.ListStore(str, str, str) #creating liststore for the same
+        exams_list_store = Gtk.ListStore(str, str,str, str,str,str,str) #creating liststore for the same
         for exam in examtt:
             exams_list_store.append(list(exam))
 
         exams_tree_view = Gtk.TreeView(exams_list_store)
 
-        for i, col_title in enumerate(["Course", "Date", "Venue"]): #rendering data
+        for i, col_title in enumerate(["Course", "Day","Mid-Sem Date","Mid-Sem Day","End-Sem Date","End-Sem Day", "Venue"]): #rendering data
             renderer = Gtk.CellRendererText()
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
             column.set_sort_column_id(i)

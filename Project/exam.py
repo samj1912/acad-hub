@@ -4,6 +4,8 @@ from webcrawler import showBooks
 
 
 #functions to remove spaces as desired
+def sortfunc(a):
+	return int(a[1])
 def stripAll(text):
 	strippedText = ''.join(text.split())
 	return strippedText
@@ -19,7 +21,7 @@ def getDate(rows,j):
 	ans=rows[j].find('td')			#getting text of the first column of the row
 	b=splitAndJoin(ans.text)
 	a=b.split()						#splitting text by spaces
-	return a[4]						#returning 5th index of the array
+	return a[1:6]						#returning 5th index of the array
 
 #function to find date
 def findDate(rows,i):
@@ -67,9 +69,12 @@ def examtt(courses):
 				
 	listarr = []								
 	for i in range(len(date)):					
-		item = [sortcourse[i] ,removeSpaces(date[i]) ,removeSpaces(rooms[i])]  #making a item of each course
+		item = [sortcourse[i] ]
+		for j in range(len(date[i])):
+			item.append(date[i][j])
+		item.append(rooms[i])	 #making a item of each course
 		listarr.append(item)					#appending it to the list array
-	return listarr	
+	return sorted(listarr	, key=sortfunc)
 
 
 
