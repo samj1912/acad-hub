@@ -4,6 +4,14 @@ v1.0 18/02/2016
 
 Copyright © 2016, team10cs243. 
 
+DISCLAIMER-
+
+The links are being provided as a convenience and for informational purposes 
+only; they do not constitute an endorsement or an approval by the Acad-Hub
+of any of the products, services or opinions of the corporation or 
+organization or individual. The Acad-Hub team bears no responsibility for 
+the accuracy, legality or content of the external site or for that of subsequent 
+links. Contact the external site for answers to questions regarding its content.
 
 
 --------------------------------------------------------------------------------
@@ -39,6 +47,8 @@ Acad-hub can also be used to search for various forms on the intranet.
 
 
 --------------------------------------------------------------------------------
+
+
 
 Requirements
 
@@ -86,4 +96,6 @@ along with Acad-Hub.(See LICENSE.md).
 
 If not, see <http://www.gnu.org/licenses/>.
 
+Beautiful Soup is used under MIT license.
+Mechanize is used under BSD License.
 
