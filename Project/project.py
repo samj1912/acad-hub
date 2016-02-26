@@ -1,5 +1,5 @@
 from gi.repository import Gtk, GObject
-from webcrawler import showBooks, showCourses 
+from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
 
@@ -35,7 +35,6 @@ class MainNotebook(Gtk.Window):
 
         self.notebook = Gtk.Notebook() #init. new notebook view
         self.add(self.notebook)
-        self.notebook.set_tab_pos(0) #setting default tab pos.
 
         courseBooks = showBooks(dept, sem) #getting an array of coursebooks and rel. info
         self.page1 = Gtk.Box() 
@@ -79,7 +78,7 @@ class MainNotebook(Gtk.Window):
 
         self.page3 = Gtk.Box()
         self.page3.set_border_width(10)
-        courses= showCourses(dept,sem) #fetching course info and credits
+        courses= showBooks(dept,sem,"courses") #fetching course info and credits
         course_list_store = Gtk.ListStore(str, str, str, str, str , str)
         for course in courses:
             course_list_store.append(list(course))
@@ -95,7 +94,6 @@ class MainNotebook(Gtk.Window):
         self.page3.pack_start(course_tree_view, True, True, 0)
         self.notebook.append_page(self.page3, Gtk.Label('Course Information'))
         #adding the course page to notebook view
-
 
 class MainBox(Gtk.Window):
 
