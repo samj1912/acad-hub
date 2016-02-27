@@ -86,4 +86,6 @@ along with Acad-Hub.(See LICENSE.md).
 
 If not, see <http://www.gnu.org/licenses/>.
 
+Beautiful Soup is used under MIT license.
+Mechanize is used under BSD License.
 
