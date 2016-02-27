@@ -3,19 +3,23 @@ from bs4 import BeautifulSoup
 from libSearch import libgenSearch, librarySearch
 import string 
 
+# Function to get rid of all the white spaces in the text
 def stripAll(text):
 	strippedText = ''.join(text.split())
 	return strippedText
-
+# Function to first split the string of all the white spaces and 
+# then join the splitted list with a space
 def splitAndJoin(text):
 	return " ".join(text.split()).rstrip().lstrip()
 
+# remove punctuations and "and" from the book name or author name
 def removePunc(text):
 	for c in string.punctuation:
 		if c is not '.':
 			text = text.replace(c, "")
 	return text.replace(" and ", " ")
 
+# For searching in institute library, get only the first author
 def getFirstAuthor(text):
 	if "," in text:
 		authors = text.split(",")
@@ -34,6 +38,8 @@ def getFirstAuthor(text):
 	return " ".join(temp2)
 
 
+# given a row that contains info about some course, 
+# return the relevant rows of the table that contain all that course's books and reference texts
 def getBooks(row):
 	para = row.findAll('p')
 
@@ -60,28 +66,28 @@ def getBooks(row):
 			ref.append(para[i])
 	return (books, ref)
 
+# get all the books for the courses in the courses list and their authors, publications, 
+# library search and download link
 def getCourseBooks(courses, soup):
-	tables = soup.findAll('table', {'class':'MsoTableGrid'})
+	# Table that contains detailed course info on the intranet page
+	tables = soup.findAll('table', {'class':'MsoTableGrid'}) 
 	rows = []
-	for table in tables:
+	for table in tables: # if there are more than 1 table
 		rows += table.findAll('tr')
 
 	strippedRows = []
 	for row in rows:
 		strippedRows.append(stripAll(row.text))
 
-	courseBooks = []
+	courseBooks = [] # list of all the relevant course books
 	for course in courses:
-		# print course
-		# print courses[course]["code"]
-		# print courses[course]["L"]
-		# print courses[course]["T"]
-		# print courses[course]["P"]
-		# print courses[course]["C"]
 		for i in range(len(rows)):
 			if courses[course]["code"] != "" and courses[course]["code"] in strippedRows[i][:10]:
-				books, ref = getBooks(rows[i])
+				# if this row contains this course's info, 
+				# get all the rows of the table containg books and references available for it
+				books, ref = getBooks(rows[i]) 
 
+				# Now, get all the relevant info for a book
 				for book in books:
 					name = book.find('i')	
 					try:
@@ -105,7 +111,12 @@ def getCourseBooks(courses, soup):
 	return courseBooks
 
 
-def showCourses(dept,sem):
+
+
+
+# Function that parses all the courses and their info and return a list of all 
+# the books in the relevant courses by calling the function getcourseBooks
+def showBooks(dept, sem, find="books"):
 	sem = int(sem)
 	url = "http://shilloi.iitg.ernet.in/~acad/intranet/CourseStructure/"+dept.lower()+"UG2013onwards.htm"
 	source_code = requests.get(url)
@@ -113,6 +124,7 @@ def showCourses(dept,sem):
 
 	soup = BeautifulSoup(plain_text, "lxml")
 
+	# This table contains the list of courses according to the semester 	
 	table = soup.find('table', {'class':'MsoNormalTable'})
 	rows = table.findAll('tr')
 	semTitleRows=[]
@@ -123,11 +135,13 @@ def showCourses(dept,sem):
 			continue
 	semTitleRows.append(len(rows))
 	
+	# which row to look at for a given sem
 	rowSemEquivalent = sem/2 - (sem+1)%2
 
-	courses = []
-
-
+	# This list contains all the course info in the form 
+	# courses["name of course"] = {"code": , "L": , "T": , "P": , "C": }
+	courses = {} 
+	courseList = []
 	for i in range(semTitleRows[rowSemEquivalent]+1, semTitleRows[rowSemEquivalent+1]-1):
 		td = rows[i].findAll('td')
 		info = []
@@ -145,54 +159,11 @@ def showCourses(dept,sem):
 				info.append(str(strippedText))
 
 		info[0] = stripAll(info[0])
-		# print info
-		courses.append(info)
-	return courses	
-
-
-def showBooks(dept, sem):
-	sem = int(sem)
-	url = "http://shilloi.iitg.ernet.in/~acad/intranet/CourseStructure/"+dept.lower()+"UG2013onwards.htm"
-	source_code = requests.get(url)
-	plain_text = source_code.text
-
-	soup = BeautifulSoup(plain_text, "lxml")
-
-	table = soup.find('table', {'class':'MsoNormalTable'})
-	rows = table.findAll('tr')
-	semTitleRows=[]
-	for i in range(len(rows)):
-		text = rows[i].text
-		if "Semester" in text:
-			semTitleRows.append(i)
-			continue
-	semTitleRows.append(len(rows))
-	
-	rowSemEquivalent = sem/2 - (sem+1)%2
-
-	courses = {}
-
-	for i in range(semTitleRows[rowSemEquivalent]+1, semTitleRows[rowSemEquivalent+1]-1):
-		td = rows[i].findAll('td')
-		info = []
-		if sem%2 == 1:
-			if stripAll(td[0].text) == "" and stripAll(td[1].text) == "":
-				continue
-			for j in range(0,6):
-				strippedText = splitAndJoin(td[j].text)
-				info.append(str(strippedText))
-		else:
-			if len(td)<=8 or stripAll(td[7].text) == "" and stripAll(td[8].text) == "":
-				continue
-			for j in range(7,len(td)):
-				strippedText = splitAndJoin(td[j].text)
-				info.append(str(strippedText))
-
-		info[0] = stripAll(info[0])
-		# print info
 		courses[info[1]] = {"code":info[0], "L":info[2], "T":info[3], "P":info[4], "C":info[5]}
+		courseList.append(info)
 
-	return getCourseBooks(courses, soup)
-
-# x=showBooks("CSE", 4)	
-# print x
+	
+	if(find == "courses"): 		# If only the course list needs to be returned
+		return courseList
+	else:						# Return all the relevant course books
+		return getCourseBooks(courses, soup) 
