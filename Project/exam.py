@@ -93,8 +93,13 @@ def listTT(dept,sem):
 	coursecodes=list(set(coursecodes))
 
 
-	# print coursecodes
-	return examtt(coursecodes)	
+	tt=examtt(coursecodes)
+	for i in range(len(tt)):
+		code=tt[i][0][0:2]+tt[i][0][3:]
+		for j in range(len(courses)):
+			if code in courses[j][0]:
+				tt[i].insert(1,courses[j][1])
+	return tt				
 
 
 # print listTT("CSE",4)
