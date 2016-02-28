@@ -16,7 +16,7 @@ def depFinder(roll): #simple function to parse the roll number and get dept.
 
     a=str(roll)
     dep=a[4:6]
-    deps={"01":"CSE","02":"ECE","03":"ME","04":"CE","06":"BT","07":"CL","08":"EEE","21":"EPh","22":"CST","23":"MC"}
+    deps={"01":"CSE","02":"ECE","03":"ME","04":"CE","05":"bdes","06":"BT","07":"CL","08":"EEE","21":"EPh","22":"CST","23":"MC"}
     return deps[dep]
 
 def displayResult(dept, sem): #result display fuction

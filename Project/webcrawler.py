@@ -118,7 +118,10 @@ def getCourseBooks(courses, soup):
 # the books in the relevant courses by calling the function getcourseBooks
 def showBooks(dept, sem, find="books"):
 	sem = int(sem)
-	url = "http://shilloi.iitg.ernet.in/~acad/intranet/CourseStructure/"+dept.lower()+"UG2013onwards.htm"
+	if dept=="bdes":
+		url= "http://shilloi.iitg.ernet.in/~acad/intranet/CourseStructure/bdes2013onwards.htm"
+	else:	
+		url = "http://shilloi.iitg.ernet.in/~acad/intranet/CourseStructure/"+dept.lower()+"UG2013onwards.htm"
 	source_code = requests.get(url)
 	plain_text = source_code.text
 
