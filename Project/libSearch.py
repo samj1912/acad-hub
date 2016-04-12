@@ -12,14 +12,21 @@ def libgenSearch(book):
 	source_code = requests.get(url)
 	#making the request
 	plain_text = source_code.text
-
+	# print url
 	soup = bs(plain_text, "lxml") #using BS4 to parse the text
 	table = soup.find('table', {'class':'c'}) #fidning the appropriate table
-	link = table.find('a', {'id':1}) #finding the link
-	if link is None:
+	links = table.findAll('a') #finding the link
+	link = ""
+	# print links
+	for i in links:
+		if 'book/index.php?' in i['href']:
+			link = i
+			break 
+	if link is "":
 		return "None"
 
 	url = "http://gen.lib.rus.ec/"+link['href'] #going to the correct url
+	# print url
 	soup = bs(requests.get(url).text, "lxml") 
 	table = soup.find('table')
 	link = table.find('a') #finding the first link in the table
@@ -27,6 +34,7 @@ def libgenSearch(book):
 	soup = bs(requests.get(link['href']).text,"lxml")
 	table = soup.find('table') 
 	link = table.find('a') #getting the final download link
+	print "http://libgen.io"+link['href']
 	return "http://libgen.io"+link['href'] #returning the final link
 
 def librarySearch(book):
