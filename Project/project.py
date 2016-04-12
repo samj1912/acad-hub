@@ -126,8 +126,11 @@ class MainNotebook(Gtk.Window):
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            uploadFile(dialog.get_filename())
-
+            uploadResponse = uploadFile(dialog.get_filename())
+            if uploadResponse == "Ok":
+                print "File Uploaded"
+            else:
+                print "Some error!"
         dialog.destroy()
 
     def add_filters(self, dialog):
