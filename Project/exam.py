@@ -21,7 +21,7 @@ def getDate(rows,j):
 	ans=rows[j].find('td')			#getting text of the first column of the row
 	b=splitAndJoin(ans.text)
 	a=b.split()						#splitting text by spaces
-	return a[1:6]						#returning 5th index of the array
+	return a[1:4]						#returning 5th index of the array
 
 #function to find date
 def findDate(rows,i):
@@ -73,7 +73,7 @@ def examtt(courses):
 		for j in range(len(date[i])):
 			item.append(date[i][j])
 		item.append(rooms[i])	 #making a item of each course
-		listarr.append(item)					#appending it to the list array
+		listarr.append(item)			#appending it to the list array
 	return sorted(listarr	, key=sortfunc)
 
 
