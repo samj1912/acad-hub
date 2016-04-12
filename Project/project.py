@@ -55,24 +55,24 @@ class MainNotebook(Gtk.Window):
         self.notebook.append_page(self.page1, Gtk.Label('Books Info'))
         #adding books page
 
-        self.page2 = Gtk.Box()
-        self.page2.set_border_width(10)
-        examtt= listTT(dept,sem) #fetching exam time table array
-        exams_list_store = Gtk.ListStore(str, str, str,str, str,str,str,str) #creating liststore for the same
-        for exam in examtt:
-            exams_list_store.append(list(exam))
+        # self.page2 = Gtk.Box()
+        # self.page2.set_border_width(10)
+        # examtt= listTT(dept,sem) #fetching exam time table array
+        # exams_list_store = Gtk.ListStore(str, str, str,str, str,str,str,str) #creating liststore for the same
+        # for exam in examtt:
+        #     exams_list_store.append(list(exam))
 
-        exams_tree_view = Gtk.TreeView(exams_list_store)
+        # exams_tree_view = Gtk.TreeView(exams_list_store)
 
-        for i, col_title in enumerate(["Course", "Course Name","Day","Mid-Sem Date","Mid-Sem Day","End-Sem Date","End-Sem Day", "Venue"]): #rendering data
-            renderer = Gtk.CellRendererText()
-            column = Gtk.TreeViewColumn(col_title, renderer, text=i)
-            column.set_sort_column_id(i)
+        # for i, col_title in enumerate(["Course", "Course Name","Day","Mid-Sem Date","Mid-Sem Day","End-Sem Date","End-Sem Day", "Venue"]): #rendering data
+        #     renderer = Gtk.CellRendererText()
+        #     column = Gtk.TreeViewColumn(col_title, renderer, text=i)
+        #     column.set_sort_column_id(i)
 
-            exams_tree_view.append_column(column)
+        #     exams_tree_view.append_column(column)
 
-        self.page2.pack_start(exams_tree_view, True, True, 0)
-        self.notebook.append_page(self.page2, Gtk.Label('Exam Time Table'))
+        # self.page2.pack_start(exams_tree_view, True, True, 0)
+        # self.notebook.append_page(self.page2, Gtk.Label('Exam Time Table'))
 
         #adding exam time table
 
