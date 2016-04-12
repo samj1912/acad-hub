@@ -2,7 +2,7 @@ from gi.repository import Gtk, GObject
 from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
-
+from notes import uploadFile
 
 def semFinder(roll): #simple function to parse the roll number and get sem
     a=str(roll)
@@ -99,7 +99,12 @@ class MainNotebook(Gtk.Window):
         self.page4 = Gtk.Box()
         self.page4.set_border_width(10)
         
+        label = Gtk.Label("Upload your notes file:")
+        self.page4.pack_start(label, True, True, 0)
+
         button1 = Gtk.Button("Choose File")
+        button1.set_size_request(5,15)
+
         button1.connect("clicked", self.on_file_clicked)
         self.page4.add(button1)
 
@@ -121,10 +126,7 @@ class MainNotebook(Gtk.Window):
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            print("Open clicked")
-            print("File selected: " + dialog.get_filename())
-        elif response == Gtk.ResponseType.CANCEL:
-            print("Cancel clicked")
+            uploadFile(dialog.get_filename())
 
         dialog.destroy()
 
