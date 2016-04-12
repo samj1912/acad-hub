@@ -98,7 +98,19 @@ class MainNotebook(Gtk.Window):
 
         self.page4 = Gtk.Box()
         self.page4.set_border_width(10)
-        
+        label = Gtk.Label("Choose the course:")
+        self.page4.pack_start(label, True, True, 0)
+        course_store = Gtk.ListStore(str)
+        for course in courses:
+            course_store.append([course[0]])
+
+        course_combo = Gtk.ComboBox.new_with_model(course_store)
+        # course_combo.connect("changed", self.on_course_combo_changed)
+        renderer_text = Gtk.CellRendererText()
+        course_combo.pack_start(renderer_text, True)
+        course_combo.add_attribute(renderer_text, "text", 0)
+        self.page4.pack_start(course_combo, False, False, True)
+
         label = Gtk.Label("Upload your notes file:")
         self.page4.pack_start(label, True, True, 0)
 
@@ -133,6 +145,8 @@ class MainNotebook(Gtk.Window):
                 print "Some error!"
         dialog.destroy()
 
+
+
     def add_filters(self, dialog):
         filter_text = Gtk.FileFilter()
         filter_text.set_name("Text files")
@@ -162,7 +176,6 @@ class MainNotebook(Gtk.Window):
             print("Folder selected: " + dialog.get_filename())
         elif response == Gtk.ResponseType.CANCEL:
             print("Cancel clicked")
-
         dialog.destroy()
 
 class MainBox(Gtk.Window):
