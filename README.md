@@ -1,6 +1,6 @@
 Acad-Hub(tentative) - Kickstart your Semester 
 
-v1.0 18/02/2016
+v1.1 13/04/2016
 
 Copyright © 2016, team10cs243. 
 
