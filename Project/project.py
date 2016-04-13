@@ -2,7 +2,7 @@ from gi.repository import Gtk, GObject
 from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
-
+from notes import uploadFile
 
 def semFinder(roll): #simple function to parse the roll number and get sem
     a=str(roll)
@@ -35,6 +35,7 @@ class MainNotebook(Gtk.Window):
 
         self.notebook = Gtk.Notebook() #init. new notebook view
         self.add(self.notebook)
+        self.notebook.set_scrollable(True)
 
         courseBooks = showBooks(dept, sem) #getting an array of coursebooks and rel. info
         self.page1 = Gtk.Box() 
@@ -94,6 +95,89 @@ class MainNotebook(Gtk.Window):
         self.page3.pack_start(course_tree_view, True, True, 0)
         self.notebook.append_page(self.page3, Gtk.Label('Course Information'))
         #adding the course page to notebook view
+
+
+        self.page4 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        self.page4.set_border_width(10)
+        label = Gtk.Label("Choose the course:")
+        self.page4.pack_start(label, False, False, 0)
+        course_store = Gtk.ListStore(str)
+        for course in courses:
+            course_store.append([course[0]])
+
+        course_combo = Gtk.ComboBox.new_with_model(course_store)
+        # course_combo.connect("changed", self.on_course_combo_changed)
+        renderer_text = Gtk.CellRendererText()
+        course_combo.pack_start(renderer_text, True)
+        course_combo.add_attribute(renderer_text, "text", 0)
+        self.page4.pack_start(course_combo, False, False, 0)
+
+        label = Gtk.Label("Upload your notes file:")
+        self.page4.pack_start(label, False, False, 0)
+
+        button1 = Gtk.Button("Choose File")
+        button1.set_size_request(5,15)
+
+        button1.connect("clicked", self.on_file_clicked)
+        self.page4.add(button1)
+
+        button2 = Gtk.Button("Choose Folder")
+        button2.connect("clicked", self.on_folder_clicked)
+        self.page4.add(button2)
+
+        self.notebook.append_page(self.page4, Gtk.Label('Notes'))
+
+
+
+    def on_file_clicked(self, widget):
+        dialog = Gtk.FileChooserDialog("Please choose a file", self,
+            Gtk.FileChooserAction.OPEN,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+
+        self.add_filters(dialog)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            uploadResponse = uploadFile(dialog.get_filename())
+            if uploadResponse == "Ok":
+                print "File Uploaded"
+            else:
+                print "Some error!"
+        dialog.destroy()
+
+
+
+    def add_filters(self, dialog):
+        filter_text = Gtk.FileFilter()
+        filter_text.set_name("Text files")
+        filter_text.add_mime_type("text/plain")
+        dialog.add_filter(filter_text)
+
+        filter_py = Gtk.FileFilter()
+        filter_py.set_name("Python files")
+        filter_py.add_mime_type("text/x-python")
+        dialog.add_filter(filter_py)
+
+        filter_any = Gtk.FileFilter()
+        filter_any.set_name("Any files")
+        filter_any.add_pattern("*")
+        dialog.add_filter(filter_any)
+
+    def on_folder_clicked(self, widget):
+        dialog = Gtk.FileChooserDialog("Please choose a folder", self,
+            Gtk.FileChooserAction.SELECT_FOLDER,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             "Select", Gtk.ResponseType.OK))
+        dialog.set_default_size(800, 400)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            print("Select clicked")
+            print("Folder selected: " + dialog.get_filename())
+        elif response == Gtk.ResponseType.CANCEL:
+            print("Cancel clicked")
+        dialog.destroy()
 
 class MainBox(Gtk.Window):
 
