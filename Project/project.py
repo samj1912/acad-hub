@@ -35,6 +35,7 @@ class MainNotebook(Gtk.Window):
 
         self.notebook = Gtk.Notebook() #init. new notebook view
         self.add(self.notebook)
+        self.notebook.set_scrollable(True)
 
         courseBooks = showBooks(dept, sem) #getting an array of coursebooks and rel. info
         self.page1 = Gtk.Box() 
@@ -96,10 +97,10 @@ class MainNotebook(Gtk.Window):
         #adding the course page to notebook view
 
 
-        self.page4 = Gtk.Box()
+        self.page4 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         self.page4.set_border_width(10)
         label = Gtk.Label("Choose the course:")
-        self.page4.pack_start(label, True, True, 0)
+        self.page4.pack_start(label, False, False, 0)
         course_store = Gtk.ListStore(str)
         for course in courses:
             course_store.append([course[0]])
@@ -109,10 +110,10 @@ class MainNotebook(Gtk.Window):
         renderer_text = Gtk.CellRendererText()
         course_combo.pack_start(renderer_text, True)
         course_combo.add_attribute(renderer_text, "text", 0)
-        self.page4.pack_start(course_combo, False, False, True)
+        self.page4.pack_start(course_combo, False, False, 0)
 
         label = Gtk.Label("Upload your notes file:")
-        self.page4.pack_start(label, True, True, 0)
+        self.page4.pack_start(label, False, False, 0)
 
         button1 = Gtk.Button("Choose File")
         button1.set_size_request(5,15)
