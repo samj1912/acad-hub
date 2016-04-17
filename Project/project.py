@@ -178,8 +178,11 @@ class MainNotebook(Gtk.Window):
         self.course_combo.set_active(index)
 
     def on_upload_clicked(self, widget, roll, course):
-        if self.fileToUpload != "":
-            uploadFile(self.fileToUpload, roll, course)
+        try:
+            if self.fileToUpload != "":
+                uploadFile(self.fileToUpload, roll, course)
+        except:
+            pass
 
     def on_file_clicked(self, widget):
         dialog = Gtk.FileChooserDialog("Please choose a file", self,
