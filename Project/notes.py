@@ -1,11 +1,13 @@
 import requests
 import os
 
-def uploadFile(file):
+def uploadFile(file, roll, course):
+	print course
 	url = 'http://10.0.2.22/upload.php'
 	files = {'fileToUpload': open(file, 'rb')}
-	r = requests.post(url, files=files)
-	return r.text
+	data = {'roll':roll, 'course':course}
+	r = requests.post(url, files=files, data=data)
+	print r.text
 
 
 def listUploads():
@@ -18,3 +20,4 @@ def listUploads():
 
 
 # listUploads()
+# uploadFile('exam.py')

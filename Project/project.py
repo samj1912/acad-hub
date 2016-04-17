@@ -3,6 +3,8 @@ from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
 from notes import uploadFile, listUploads
+from Tkinter import Tk
+from tkFileDialog import askopenfilename
 
 def semFinder(roll): #simple function to parse the roll number and get sem
     a=str(roll)
@@ -19,8 +21,8 @@ def depFinder(roll): #simple function to parse the roll number and get dept.
     deps={"01":"CSE","02":"ECE","03":"ME","04":"CE","05":"bdes","06":"BT","07":"CL","08":"EEE","21":"EPh","22":"CST","23":"MC"}
     return deps[dep]
 
-def displayResult(dept, sem): #result display fuction
-	win = MainNotebook(dept,sem) #calling notebookview
+def displayResult(dept, sem, roll): #result display fuction
+	win = MainNotebook(dept,sem,roll) #calling notebookview
 	win.connect("delete-event", Gtk.main_quit)
 	win.show_all()
 	Gtk.main()
@@ -28,8 +30,7 @@ def displayResult(dept, sem): #result display fuction
 
 class MainNotebook(Gtk.Window):
 
-    def __init__(self,dept="CSE",sem=3):
-
+    def __init__(self,dept="CSE",sem=3,roll='140101063'):
         Gtk.Window.__init__(self, title="Acad-Hub")
         self.set_default_size(300, 300)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -85,7 +86,6 @@ class MainNotebook(Gtk.Window):
         course_list_store = Gtk.ListStore(str, str, str, str, str , str)
         for course in courses:
             course_list_store.append(list(course))
-
         course_tree_view = Gtk.TreeView(course_list_store)
 
         for i, col_title in enumerate(["Course-Code", "Course Name", "L", "T", "P" , "C"]):
@@ -153,6 +153,7 @@ class MainNotebook(Gtk.Window):
         buttonbox.add(button_choose_file)
 
         button_upload = Gtk.Button("Upload")
+        button_upload.connect("clicked", self.on_upload_clicked, roll, courses[0][course_combo.get_active()])
         buttonbox.add(button_upload)
 
         grid.attach_next_to(buttonbox, scrolledwindow,
@@ -161,7 +162,9 @@ class MainNotebook(Gtk.Window):
         self.page4.pack_start(grid, True, True, 0)
         self.notebook.append_page(self.page4, Gtk.Label('Notes'))
 
-
+    def on_upload_clicked(self, widget, roll, course):
+        if self.fileToUpload != "":
+            uploadFile(self.fileToUpload, roll, course)
 
     def on_file_clicked(self, widget):
         dialog = Gtk.FileChooserDialog("Please choose a file", self,
@@ -170,16 +173,11 @@ class MainNotebook(Gtk.Window):
              Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 
         self.add_filters(dialog)
-
+        self.fileToUpload = ""
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            uploadResponse = uploadFile(dialog.get_filename())
-            if uploadResponse == "Ok":
-                print "File Uploaded"
-            else:
-                print "Some error!"
+            self.fileToUpload = dialog.get_filename()
         dialog.destroy()
-
 
 
     def add_filters(self, dialog):
@@ -239,7 +237,7 @@ class MainBox(Gtk.Window):
         self.roll=self.entry.get_text()
         self.sem=semFinder(self.roll)
         self.dept=depFinder(self.roll)
-        displayResult(self.dept, self.sem)
+        displayResult(self.dept, self.sem, self.roll)
 
 win = MainBox() #calling the mainbox
 win.connect("delete-event", Gtk.main_quit) #adding the quit event listener
