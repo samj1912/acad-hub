@@ -107,30 +107,30 @@ class MainNotebook(Gtk.Window):
         scrolledwindow.set_policy(Gtk.PolicyType.NEVER,
                                        Gtk.PolicyType.AUTOMATIC)
 
-        liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str)
-        pics_list,pics_name = listUploads()
-        for name, pic in zip(pics_name, pics_list):
-            pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
-            liststore.append([pxbf, name])
+        liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
+        # pics_list,pics_name = listUploads()
+        # for name, pic in zip(pics_name, pics_list):
+        #     pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
+        #     liststore.append([pxbf, name])
 
-        treeview = Gtk.TreeView(model=liststore)
-        treeview.set_hexpand(True)
-        treeview.set_vexpand(True)
-        # creamos las columnas del TreeView
-        renderer_pixbuf = Gtk.CellRendererPixbuf()
-        column_pixbuf = Gtk.TreeViewColumn('Preview', renderer_pixbuf, pixbuf=0)
-        column_pixbuf.set_alignment(0.5)
-        treeview.append_column(column_pixbuf)
+        # treeview = Gtk.TreeView(model=liststore)
+        # treeview.set_hexpand(True)
+        # treeview.set_vexpand(True)
+        # # creamos las columnas del TreeView
+        # renderer_pixbuf = Gtk.CellRendererPixbuf()
+        # column_pixbuf = Gtk.TreeViewColumn('Preview', renderer_pixbuf, pixbuf=0)
+        # column_pixbuf.set_alignment(0.5)
+        # treeview.append_column(column_pixbuf)
 
-        renderer_text = Gtk.CellRendererText(weight=600)
-        renderer_text.set_fixed_size(200, -1)
-        column_text = Gtk.TreeViewColumn('Filename', renderer_text, text=1)
-        column_text.set_sort_column_id(1)
-        column_text.set_alignment(0.5)
-        treeview.append_column(column_text)
+        # renderer_text = Gtk.CellRendererText(weight=600)
+        # renderer_text.set_fixed_size(200, -1)
+        # column_text = Gtk.TreeViewColumn('Filename', renderer_text, text=1)
+        # column_text.set_sort_column_id(1)
+        # column_text.set_alignment(0.5)
+        # treeview.append_column(column_text)
 
-        scrolledwindow.add_with_viewport(treeview)
-        grid.attach(scrolledwindow, 0, 0, 1, 1)
+        # scrolledwindow.add_with_viewport(treeview)
+        # grid.attach(scrolledwindow, 0, 0, 1, 1)
 
         course_store = Gtk.ListStore(str)
         for course in courses:
@@ -156,6 +156,36 @@ class MainNotebook(Gtk.Window):
         button_upload.connect("clicked", self.on_upload_clicked, roll, courses[0][course_combo.get_active()])
         buttonbox.add(button_upload)
 
+        pics_list,pics_name,uploader_list = listUploads(courses[0][course_combo.get_active()])
+        for name, pic, uploader in zip(pics_name, pics_list, uploader_list):
+            pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
+            liststore.append([pxbf, name, uploader])
+
+        treeview = Gtk.TreeView(model=liststore)
+        treeview.set_hexpand(True)
+        treeview.set_vexpand(True)
+        # creamos las columnas del TreeView
+        renderer_pixbuf = Gtk.CellRendererPixbuf()
+        column_pixbuf = Gtk.TreeViewColumn('Preview', renderer_pixbuf, pixbuf=0)
+        column_pixbuf.set_alignment(0.5)
+        treeview.append_column(column_pixbuf)
+
+        renderer_text = Gtk.CellRendererText(weight=600)
+        renderer_text.set_fixed_size(200, -1)
+        column_text = Gtk.TreeViewColumn('Filename', renderer_text, text=1)
+        column_text.set_sort_column_id(1)
+        column_text.set_alignment(0.5)
+        treeview.append_column(column_text)
+
+        renderer_text = Gtk.CellRendererText(weight=600)
+        renderer_text.set_fixed_size(200, -1)
+        column_text = Gtk.TreeViewColumn('Uploaded By', renderer_text, text=2)
+        # column_text.set_sort_column_id(1)
+        column_text.set_alignment(0.5)
+        treeview.append_column(column_text)
+
+        scrolledwindow.add_with_viewport(treeview)
+        grid.attach(scrolledwindow, 0, 0, 1, 1)
         grid.attach_next_to(buttonbox, scrolledwindow,
                                  Gtk.PositionType.BOTTOM, 1, 1)
 
