@@ -1,8 +1,8 @@
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, GdkPixbuf
 from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
-from notes import uploadFile
+from notes import uploadFile, listUploads
 
 def semFinder(roll): #simple function to parse the roll number and get sem
     a=str(roll)
@@ -31,7 +31,9 @@ class MainNotebook(Gtk.Window):
     def __init__(self,dept="CSE",sem=3):
 
         Gtk.Window.__init__(self, title="Acad-Hub")
-        self.set_border_width(3)
+        self.set_default_size(300, 300)
+        self.set_position(Gtk.WindowPosition.CENTER)
+        self.set_border_width(10)
 
         self.notebook = Gtk.Notebook() #init. new notebook view
         self.add(self.notebook)
@@ -97,34 +99,66 @@ class MainNotebook(Gtk.Window):
         #adding the course page to notebook view
 
 
-        self.page4 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        self.page4 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.page4.set_border_width(10)
-        label = Gtk.Label("Choose the course:")
-        self.page4.pack_start(label, False, False, 0)
+        grid = Gtk.Grid(column_homogeneous=True, column_spacing=10, row_spacing=10)
+
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.set_policy(Gtk.PolicyType.NEVER,
+                                       Gtk.PolicyType.AUTOMATIC)
+
+        liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str)
+        pics_list,pics_name = listUploads()
+        for name, pic in zip(pics_name, pics_list):
+            pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
+            liststore.append([pxbf, name])
+
+        treeview = Gtk.TreeView(model=liststore)
+        treeview.set_hexpand(True)
+        treeview.set_vexpand(True)
+        # creamos las columnas del TreeView
+        renderer_pixbuf = Gtk.CellRendererPixbuf()
+        column_pixbuf = Gtk.TreeViewColumn('Preview', renderer_pixbuf, pixbuf=0)
+        column_pixbuf.set_alignment(0.5)
+        treeview.append_column(column_pixbuf)
+
+        renderer_text = Gtk.CellRendererText(weight=600)
+        renderer_text.set_fixed_size(200, -1)
+        column_text = Gtk.TreeViewColumn('Filename', renderer_text, text=1)
+        column_text.set_sort_column_id(1)
+        column_text.set_alignment(0.5)
+        treeview.append_column(column_text)
+
+        scrolledwindow.add_with_viewport(treeview)
+        grid.attach(scrolledwindow, 0, 0, 1, 1)
+
         course_store = Gtk.ListStore(str)
         for course in courses:
             course_store.append([course[0]])
-
+        
         course_combo = Gtk.ComboBox.new_with_model(course_store)
-        # course_combo.connect("changed", self.on_course_combo_changed)
-        renderer_text = Gtk.CellRendererText()
-        course_combo.pack_start(renderer_text, True)
-        course_combo.add_attribute(renderer_text, "text", 0)
-        self.page4.pack_start(course_combo, False, False, 0)
+        # course_combo.connect('changed', self.on_option_combo_changed)
+        renderer_combo_text = Gtk.CellRendererText()
+        course_combo.pack_start(renderer_combo_text, True)
+        course_combo.add_attribute(renderer_combo_text, 'text', 0)
+        course_combo.set_active(0)
 
-        label = Gtk.Label("Upload your notes file:")
-        self.page4.pack_start(label, False, False, 0)
+        buttonbox = Gtk.ButtonBox(Gtk.Orientation.HORIZONTAL)
+        buttonbox.set_layout(Gtk.ButtonBoxStyle.EDGE)
 
-        button1 = Gtk.Button("Choose File")
-        button1.set_size_request(5,15)
+        buttonbox.add(course_combo)
+    
+        button_choose_file = Gtk.Button("Choose File")
+        button_choose_file.connect("clicked", self.on_file_clicked)
+        buttonbox.add(button_choose_file)
 
-        button1.connect("clicked", self.on_file_clicked)
-        self.page4.add(button1)
+        button_upload = Gtk.Button("Upload")
+        buttonbox.add(button_upload)
 
-        button2 = Gtk.Button("Choose Folder")
-        button2.connect("clicked", self.on_folder_clicked)
-        self.page4.add(button2)
+        grid.attach_next_to(buttonbox, scrolledwindow,
+                                 Gtk.PositionType.BOTTOM, 1, 1)
 
+        self.page4.pack_start(grid, True, True, 0)
         self.notebook.append_page(self.page4, Gtk.Label('Notes'))
 
 
@@ -164,20 +198,20 @@ class MainNotebook(Gtk.Window):
         filter_any.add_pattern("*")
         dialog.add_filter(filter_any)
 
-    def on_folder_clicked(self, widget):
-        dialog = Gtk.FileChooserDialog("Please choose a folder", self,
-            Gtk.FileChooserAction.SELECT_FOLDER,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-             "Select", Gtk.ResponseType.OK))
-        dialog.set_default_size(800, 400)
+    # def on_folder_clicked(self, widget):
+    #     dialog = Gtk.FileChooserDialog("Please choose a folder", self,
+    #         Gtk.FileChooserAction.SELECT_FOLDER,
+    #         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+    #          "Select", Gtk.ResponseType.OK))
+    #     dialog.set_default_size(800, 400)
 
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            print("Select clicked")
-            print("Folder selected: " + dialog.get_filename())
-        elif response == Gtk.ResponseType.CANCEL:
-            print("Cancel clicked")
-        dialog.destroy()
+    #     response = dialog.run()
+    #     if response == Gtk.ResponseType.OK:
+    #         print("Select clicked")
+    #         print("Folder selected: " + dialog.get_filename())
+    #     elif response == Gtk.ResponseType.CANCEL:
+    #         print("Cancel clicked")
+    #     dialog.destroy()
 
 class MainBox(Gtk.Window):
 
