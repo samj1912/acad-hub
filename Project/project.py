@@ -108,55 +108,36 @@ class MainNotebook(Gtk.Window):
                                        Gtk.PolicyType.AUTOMATIC)
 
         liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
-        # pics_list,pics_name = listUploads()
-        # for name, pic in zip(pics_name, pics_list):
-        #     pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
-        #     liststore.append([pxbf, name])
 
-        # treeview = Gtk.TreeView(model=liststore)
-        # treeview.set_hexpand(True)
-        # treeview.set_vexpand(True)
-        # # creamos las columnas del TreeView
-        # renderer_pixbuf = Gtk.CellRendererPixbuf()
-        # column_pixbuf = Gtk.TreeViewColumn('Preview', renderer_pixbuf, pixbuf=0)
-        # column_pixbuf.set_alignment(0.5)
-        # treeview.append_column(column_pixbuf)
-
-        # renderer_text = Gtk.CellRendererText(weight=600)
-        # renderer_text.set_fixed_size(200, -1)
-        # column_text = Gtk.TreeViewColumn('Filename', renderer_text, text=1)
-        # column_text.set_sort_column_id(1)
-        # column_text.set_alignment(0.5)
-        # treeview.append_column(column_text)
-
-        # scrolledwindow.add_with_viewport(treeview)
-        # grid.attach(scrolledwindow, 0, 0, 1, 1)
-
-        course_store = Gtk.ListStore(str)
-        for course in courses:
-            course_store.append([course[0]])
+        # course_store = Gtk.ListStore(str)
+        # for course in courses:
+        #     course_store.append([course[0]])
         
-        course_combo = Gtk.ComboBox.new_with_model(course_store)
-        # course_combo.connect('changed', self.on_option_combo_changed)
-        renderer_combo_text = Gtk.CellRendererText()
-        course_combo.pack_start(renderer_combo_text, True)
-        course_combo.add_attribute(renderer_combo_text, 'text', 0)
-        course_combo.set_active(0)
+        self.course_combo = Gtk.ComboBoxText()
+        self.course_combo.set_entry_text_column(0)
+        courseList = []
+        for course in courses:
+            courseList.append(str(course[0]))
+        for course in courseList:
+            self.course_combo.append_text(course)
+        self.course_combo.connect('changed', self.on_course_combo_changed)
+
+        self.course_combo.set_active(0)
 
         buttonbox = Gtk.ButtonBox(Gtk.Orientation.HORIZONTAL)
         buttonbox.set_layout(Gtk.ButtonBoxStyle.EDGE)
 
-        buttonbox.add(course_combo)
+        buttonbox.add(self.course_combo)
     
         button_choose_file = Gtk.Button("Choose File")
         button_choose_file.connect("clicked", self.on_file_clicked)
         buttonbox.add(button_choose_file)
 
         button_upload = Gtk.Button("Upload")
-        button_upload.connect("clicked", self.on_upload_clicked, roll, courses[0][course_combo.get_active()])
+        button_upload.connect("clicked", self.on_upload_clicked, roll, courseList[self.course_combo.get_active()])
         buttonbox.add(button_upload)
 
-        pics_list,pics_name,uploader_list = listUploads(courses[0][course_combo.get_active()])
+        pics_list,pics_name,uploader_list = listUploads(courseList[self.course_combo.get_active()])
         for name, pic, uploader in zip(pics_name, pics_list, uploader_list):
             pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
             liststore.append([pxbf, name, uploader])
@@ -191,6 +172,10 @@ class MainNotebook(Gtk.Window):
 
         self.page4.pack_start(grid, True, True, 0)
         self.notebook.append_page(self.page4, Gtk.Label('Notes'))
+
+    def on_course_combo_changed(self, combo):
+        index = self.course_combo.get_active()
+        self.course_combo.set_active(index)
 
     def on_upload_clicked(self, widget, roll, course):
         if self.fileToUpload != "":
