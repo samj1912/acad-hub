@@ -42,11 +42,11 @@ def listUploads(course):
 
 def downloadFile(filename, filepath, course, roll):
 	url = 'http://10.0.2.22/download.php'
-	print filename, filepath, course, roll
 	data = {'course':course, 'file':filename, 'roll':roll}
 	r = requests.post(url, data=data)
 	with open(filepath+'/'+filename, 'wb') as f:
 		f.write(r.content)
+	print "Yayy!"
 
 # downloadFile('EZ.txt', '/home/maulik/Desktop/test', 'CS203', '140101063')
 # listUploads("CS203")
