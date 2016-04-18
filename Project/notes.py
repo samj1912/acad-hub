@@ -3,7 +3,7 @@ import os
 import time
 
 def uploadFile(file, roll, course):
-	url = 'http://10.0.2.22/upload.php'
+	url = 'http://172.16.115.76/upload.php'
 	files = {'fileToUpload': open(file, 'rb')}
 	data = {'roll':roll, 'course':course}
 	r = requests.post(url, files=files, data=data)
@@ -13,7 +13,7 @@ def uploadFile(file, roll, course):
 		print "error while uploading"
 
 def listUploads(course):
-	url = 'http://10.0.2.22/listfiles.php'
+	url = 'http://172.16.115.76/listfiles.php'
 	data = {'course':course}
 	r = requests.post(url, data=data)
 	# print r.text
@@ -29,7 +29,6 @@ def listUploads(course):
 		filename.append(files[i][9:])
 		realTime = time.asctime(time.localtime(int(files[i+1])))
 		uploadTime.append(str(realTime))
-		# print time.asctime(time.localtime(int(files[i+1])))
 		flag = 0
 		for icon in fileicons:
 			if files[i].split('.')[-1] in icon.split('.')[0]:
@@ -40,6 +39,13 @@ def listUploads(course):
 			icons.append(icondir+'default.png')
 	return icons, filename, uploadedby, uploadTime
 
+def downloadFile(file, course, roll):
+	url = 'http://10.0.2.22/download.php'
+	data = {'course':course, 'file':file, 'roll':roll}
+	r = requests.post(url, data=data)
+	with open(file, 'wb') as f:
+		f.write(r.content)
 
+# downloadFile('doc.cpp', 'CS203', '140101063')
 # listUploads("CS203")
 # uploadFile('exam.py')
