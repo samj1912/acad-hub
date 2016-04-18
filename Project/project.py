@@ -48,14 +48,27 @@ class MainNotebook(Gtk.Window):
 			books_list_store.append(list(book))
 
 		books_tree_view = Gtk.TreeView(books_list_store) #adding to treeview
+
 		#adding columns
 		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability", "Download link"]):
 			renderer = Gtk.CellRendererText()
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
 			column.set_sort_column_id(i) #allowing sortable columns
 			books_tree_view.append_column(column) 
+			
+
+		
 
 		self.page1.pack_start(books_tree_view, True, True, 0)
+
+		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+
+		for book in courseBooks:
+			button = Gtk.LinkButton(book[6],label="Download")
+			vbox.pack_start(button, True, True, 0)
+
+		self.page1.pack_start(vbox,True,True,0)
+
 		self.notebook.append_page(self.page1, Gtk.Label('Books Info'))
 		#adding books page
 
