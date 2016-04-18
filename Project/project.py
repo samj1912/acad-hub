@@ -107,7 +107,7 @@ class MainNotebook(Gtk.Window):
 		self.scrolledwindow.set_policy(Gtk.PolicyType.NEVER,
 									   Gtk.PolicyType.AUTOMATIC)
 
-		self.liststore_files = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str)
+		self.liststore_files = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str)
 
 
 		self.course_combo = Gtk.ComboBoxText()
@@ -134,35 +134,6 @@ class MainNotebook(Gtk.Window):
 		button_upload.connect("clicked", self.on_upload_clicked,roll)
 		buttonbox.add(button_upload)
 
-		# pics_list,pics_name,uploader_list = listUploads(self.courseList[self.course_combo.get_active()])
-		# for name, pic, uploader in zip(pics_name, pics_list, uploader_list):
-		# 	pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
-		# 	liststore.append([pxbf, name, uploader])
-
-		# treeview = Gtk.TreeView(model=self.liststore)
-		# treeview.set_hexpand(True)
-		# treeview.set_vexpand(True)
-		# # creamos las columnas del TreeView
-		# renderer_pixbuf = Gtk.CellRendererPixbuf()
-		# column_pixbuf = Gtk.TreeViewColumn('Preview', renderer_pixbuf, pixbuf=0)
-		# column_pixbuf.set_alignment(0.5)
-		# treeview.append_column(column_pixbuf)
-
-		# renderer_text = Gtk.CellRendererText(weight=600)
-		# renderer_text.set_fixed_size(200, -1)
-		# column_text = Gtk.TreeViewColumn('Filename', renderer_text, text=1)
-		# column_text.set_sort_column_id(1)
-		# column_text.set_alignment(0.5)
-		# treeview.append_column(column_text)
-
-		# renderer_text = Gtk.CellRendererText(weight=600)
-		# renderer_text.set_fixed_size(200, -1)
-		# column_text = Gtk.TreeViewColumn('Uploaded By', renderer_text, text=2)
-		# # column_text.set_sort_column_id(1)
-		# column_text.set_alignment(0.5)
-		# treeview.append_column(column_text)
-
-		# self.scrolledwindow.add_with_viewport(treeview)
 		self.updateFileList()
 		grid.attach(self.scrolledwindow, 0, 0, 1, 1)
 		grid.attach_next_to(buttonbox, self.scrolledwindow,
@@ -170,6 +141,7 @@ class MainNotebook(Gtk.Window):
 
 		self.page4.pack_start(grid, True, True, 0)
 		self.notebook.append_page(self.page4, Gtk.Label('Notes'))
+
 
 	def on_course_combo_changed(self, combo):
 		self.updateFileList()
@@ -217,11 +189,11 @@ class MainNotebook(Gtk.Window):
 		dialog.add_filter(filter_any)
 
 	def updateFileList(self):
-		pics_list,pics_name,uploader_list = listUploads(self.courseList[self.course_combo.get_active()])
+		pics_list,pics_name,uploader_list,upload_time = listUploads(self.courseList[self.course_combo.get_active()])
 		self.liststore_files.clear()
-		for name, pic, uploader in zip(pics_name, pics_list, uploader_list):
-		  pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
-		  self.liststore_files.append([pxbf, name, uploader])
+		for name, pic, uploader, time in zip(pics_name, pics_list, uploader_list, upload_time):
+			pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
+			self.liststore_files.append([pxbf, name, uploader, time])
 
 		treeview = Gtk.TreeView(model=self.liststore_files)
 		treeview.set_hexpand(True)
@@ -245,10 +217,15 @@ class MainNotebook(Gtk.Window):
 		# column_text.set_sort_column_id(1)
 		column_text.set_alignment(0.5)
 		treeview.append_column(column_text)
-		child = self.scrolledwindow.get_child()
-		# if child != None:
-		# 	self.scrolledwindow.remove(self.scrolledwindow.get_child())
-		self.scrolledwindow.add_with_viewport(treeview)        
+
+		renderer_text = Gtk.CellRendererText()
+		renderer_text.set_fixed_size(200, -1)
+		column_text = Gtk.TreeViewColumn('Upload time', renderer_text, text=3)
+		column_text.set_sort_column_id(1)
+		column_text.set_alignment(0.5)
+		treeview.append_column(column_text)      
+
+		self.scrolledwindow.add_with_viewport(treeview)  
 
 	# def on_folder_clicked(self, widget):
 	#     dialog = Gtk.FileChooserDialog("Please choose a folder", self,
