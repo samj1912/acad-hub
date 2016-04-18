@@ -9,7 +9,7 @@ def uploadFile(file, roll, course):
 	if r.text == "Ok":
 		print "Your file has been uploaded successfully!"
 	else:
-		print "error"
+		print "error while uploading"
 
 def listUploads(course):
 	url = 'http://10.0.2.22/listfiles.php'
