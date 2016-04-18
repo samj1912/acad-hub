@@ -98,7 +98,6 @@ class MainNotebook(Gtk.Window):
 		self.notebook.append_page(self.page3, Gtk.Label('Course Information'))
 		#adding the course page to notebook view
 
-
 		self.page4 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 		self.page4.set_border_width(10)
 		grid = Gtk.Grid(column_homogeneous=True, column_spacing=10, row_spacing=10)
@@ -221,7 +220,7 @@ class MainNotebook(Gtk.Window):
 		renderer_text = Gtk.CellRendererText()
 		renderer_text.set_fixed_size(200, -1)
 		column_text = Gtk.TreeViewColumn('Upload time', renderer_text, text=3)
-		column_text.set_sort_column_id(1)
+		column_text.set_sort_column_id(3)
 		column_text.set_alignment(0.5)
 		treeview.append_column(column_text)      
 
