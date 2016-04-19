@@ -41,9 +41,10 @@ def listUploads(course):
 
 
 def downloadFile(filename, filepath, course, roll):
-	url = 'http://10.0.2.22/download.php'
+	url = 'http://172.16.115.76/download.php'
 	data = {'course':course, 'file':filename, 'roll':roll}
 	r = requests.post(url, data=data)
+	print r.text
 	with open(filepath+'/'+filename, 'wb') as f:
 		f.write(r.content)
 	print "Yayy!"
