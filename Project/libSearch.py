@@ -5,7 +5,7 @@ def splitAndJoin(text):
 	return " ".join(text.split()).rstrip().lstrip()
 
 def libgenSearch(book):
-	#return "None" #returning none for now, below is the main function
+	return "None" #returning none for now, below is the main function
 	# return "https://www.google.com"
 	name = book[0] #getting the name of the book
 	author = book[1] #getting the authors
@@ -40,7 +40,7 @@ def libgenSearch(book):
 	return "http://libgen.io"+link['href'] #returning the final link
 
 def librarySearch(book):
-	# return "None"
+	return "None"
 	name = book[0]
 	author = book[1]
 	url = "http://bidya.iitg.ernet.in:8680/opac/search/searchResult.html?searchdata="+name+"&qcon1=1&cat1=1&con1=1&searchdata2="+author+"&qcon2=1&cat2=0&con2=1&searchdata3=&qcon3=1&cat3=7&docType=BK&fromTF1=&toTF1=&sortBy=-1&level1=&physicalForm1=&sourceTF1=&subjectCode1=&subjectDocType1=&locationTF1=&db=8&databaseList=&search_selectedSites=1"
