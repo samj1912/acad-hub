@@ -2,7 +2,7 @@ from gi.repository import Gtk, GObject, GdkPixbuf
 from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
-from notes import uploadFile, listUploads
+from notes import uploadFile, listUploads, downloadFile
 from Tkinter import Tk
 from tkFileDialog import askopenfilename
 
@@ -32,7 +32,9 @@ class MainNotebook(Gtk.Window):
 
 	def __init__(self,dept="CSE",sem=3,roll='140101063'):
 		Gtk.Window.__init__(self, title="Acad-Hub")
-		self.set_default_size(300, 300)
+		# self.set_resizable(True)
+		# self.maximize()
+		# self.set_default_size(300, 300)
 		self.set_position(Gtk.WindowPosition.CENTER)
 		self.set_border_width(10)
 
@@ -86,9 +88,11 @@ class MainNotebook(Gtk.Window):
 			exams_list_store.append(list(exam))
 
 		exams_tree_view = Gtk.TreeView(exams_list_store)
+		exams_tree_view.columns_autosize()
 
 		for i, col_title in enumerate(["Course", "Course Name","Day","End-Sem Date","End-Sem Day", "Venue"]): #rendering data
 			renderer = Gtk.CellRendererText()
+
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
 			column.set_sort_column_id(i)
 
@@ -109,6 +113,7 @@ class MainNotebook(Gtk.Window):
 
 		for i, col_title in enumerate(["Course-Code", "Course Name", "L", "T", "P" , "C"]):
 			renderer = Gtk.CellRendererText()
+
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
 			column.set_sort_column_id(i)
 			course_tree_view.append_column(column)
@@ -131,6 +136,8 @@ class MainNotebook(Gtk.Window):
 		self.course_combo = Gtk.ComboBoxText()
 		self.course_combo.set_entry_text_column(0)
 		self.courseList = []
+		self.activeFilename = ""
+		self.activeRoll = ""
 		for course in courses:
 			self.courseList.append(str(course[0]))
 		for course in self.courseList:
@@ -152,6 +159,10 @@ class MainNotebook(Gtk.Window):
 		button_upload.connect("clicked", self.on_upload_clicked,roll)
 		buttonbox.add(button_upload)
 
+		button_download = Gtk.Button("Download")
+		button_download.connect("clicked", self.on_download_clicked)
+		buttonbox.add(button_download)
+
 		self.updateFileList()
 		grid.attach(self.scrolledwindow, 0, 0, 1, 1)
 		grid.attach_next_to(buttonbox, self.scrolledwindow,
@@ -165,6 +176,23 @@ class MainNotebook(Gtk.Window):
 		self.updateFileList()
 		index = combo.get_active()
 		combo.set_active(index)
+
+	def on_download_clicked(self,widget):
+		dialog = Gtk.FileChooserDialog("Please choose a folder", self,
+			Gtk.FileChooserAction.SELECT_FOLDER,
+			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+			 "Select", Gtk.ResponseType.OK))
+		dialog.set_default_size(800, 400)
+		response = dialog.run()
+		if response == Gtk.ResponseType.OK:
+			location = dialog.get_filename()
+			activeCourse = self.courseList[self.course_combo.get_active()]
+			# filename, roll = self.getSelectedFileDetails()
+			# print filename,roll
+			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
+			# print self.activeFilename,location,self.activeRoll
+		dialog.destroy()
+
 
 	def on_upload_clicked(self, widget,roll):
 		try:
@@ -206,6 +234,15 @@ class MainNotebook(Gtk.Window):
 		filter_any.add_pattern("*")
 		dialog.add_filter(filter_any)
 
+
+	def getSelectedFileDetails(self, tree_selection):
+		(model, pathlist) = tree_selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = model.get_iter(path)
+			self.activeFilename = model.get_value(tree_iter,1)
+			self.activeRoll = model.get_value(tree_iter,2)
+
+
 	def updateFileList(self):
 		pics_list,pics_name,uploader_list,upload_time = listUploads(self.courseList[self.course_combo.get_active()])
 		self.liststore_files.clear()
@@ -213,37 +250,47 @@ class MainNotebook(Gtk.Window):
 			pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
 			self.liststore_files.append([pxbf, name, uploader, time])
 
-		treeview = Gtk.TreeView(model=self.liststore_files)
-		treeview.set_hexpand(True)
-		treeview.set_vexpand(True)
+		self.treeview = Gtk.TreeView(model=self.liststore_files)
+		self.treeview.set_hexpand(True)
+		self.treeview.set_vexpand(True)
 		# creamos las columnas del TreeView
 		renderer_pixbuf = Gtk.CellRendererPixbuf()
 		column_pixbuf = Gtk.TreeViewColumn('Preview', renderer_pixbuf, pixbuf=0)
 		column_pixbuf.set_alignment(0.5)
-		treeview.append_column(column_pixbuf)
+		self.treeview.append_column(column_pixbuf)
 
 		renderer_text = Gtk.CellRendererText(weight=600)
 		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
 		column_text = Gtk.TreeViewColumn('Filename', renderer_text, text=1)
 		column_text.set_sort_column_id(1)
 		column_text.set_alignment(0.5)
-		treeview.append_column(column_text)
+		self.treeview.append_column(column_text)
 
 		renderer_text = Gtk.CellRendererText(weight=600)
 		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
 		column_text = Gtk.TreeViewColumn('Uploaded By', renderer_text, text=2)
 		# column_text.set_sort_column_id(1)
 		column_text.set_alignment(0.5)
-		treeview.append_column(column_text)
+		self.treeview.append_column(column_text)
 
 		renderer_text = Gtk.CellRendererText()
 		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
 		column_text = Gtk.TreeViewColumn('Upload time', renderer_text, text=3)
 		column_text.set_sort_column_id(3)
 		column_text.set_alignment(0.5)
-		treeview.append_column(column_text)      
+		self.treeview.append_column(column_text)      
 
-		self.scrolledwindow.add_with_viewport(treeview)  
+		tree_selection = self.treeview.get_selection()
+
+		tree_selection.connect("changed", self.getSelectedFileDetails)
+
+		self.scrolledwindow.add_with_viewport(self.treeview)  
 
 	# def on_folder_clicked(self, widget):
 	#     dialog = Gtk.FileChooserDialog("Please choose a folder", self,
@@ -265,7 +312,7 @@ class MainBox(Gtk.Window):
 	def __init__(self):
 		
 		Gtk.Window.__init__(self, title="SemBegins!") #main window
-		self.set_default_size(200, 100) #setting default size
+		# self.set_default_size(200, 100) #setting default size
 		self.set_border_width(10)		
 
 		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
