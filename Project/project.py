@@ -52,8 +52,10 @@ class MainNotebook(Gtk.Window):
 		#adding columns
 		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability", "Download link"]):
 			renderer = Gtk.CellRendererText()
+			renderer.set_property('editable', True)
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
 			column.set_max_width(150)
+			column.set_resizable(True)
 			column.set_sort_column_id(i) #allowing sortable columns
 			books_tree_view.append_column(column) 
 			
