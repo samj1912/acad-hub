@@ -5,7 +5,8 @@ def splitAndJoin(text):
 	return " ".join(text.split()).rstrip().lstrip()
 
 def libgenSearch(book):
-	return "None" #returning none for now, below is the main function
+	#return "None" #returning none for now, below is the main function
+	return "https://www.google.com"
 	name = book[0] #getting the name of the book
 	author = book[1] #getting the authors
 	url = "http://gen.lib.rus.ec/search.php?req="+name+" "+author+"&open=0&view=simple&phrase=1&column=def"
@@ -35,6 +36,7 @@ def libgenSearch(book):
 	table = soup.find('table') 
 	link = table.find('a') #getting the final download link
 	print "http://libgen.io"+link['href']
+
 	return "http://libgen.io"+link['href'] #returning the final link
 
 def librarySearch(book):
