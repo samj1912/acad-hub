@@ -41,9 +41,10 @@ class MainNotebook(Gtk.Window):
 		# self.set_default_size(300, 300)
 		self.set_position(Gtk.WindowPosition.CENTER)
 		self.set_border_width(10)
-
+		WindowBox=Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 		self.notebook = Gtk.Notebook() #init. new notebook view
-		self.add(self.notebook)
+		WindowBox.pack_start(self.notebook,True,True,0)
+
 		self.notebook.set_scrollable(True)
 
 		courseBooks = showBooks(dept, sem) #getting an array of coursebooks and rel. info
@@ -208,16 +209,19 @@ class MainNotebook(Gtk.Window):
 		self.page4.pack_start(grid, True, True, 0)
 		self.notebook.append_page(self.page4, Gtk.Label('Notes'))
 
-	# def on_treeview_click(self, treeview, path, view_column):
- #        model=treeview.get_model()
- #        action_id=model[path][0]
- #        url='....' # build your url
- #        webbrowser.open(url)
- 	def on_treeview_click(self, treeview,path,view_column):
- 		model=treeview.get_model()
- 		action_id=model[path][0]
- 		url="https://www.google.com"
- 		webbrowser.open(url)
+
+		Logout = Gtk.Button(label="Logout")
+		Logout.connect("clicked", self.Logout) #button click event
+		WindowBox.pack_start(Logout,True,True,0)
+
+		self.add(WindowBox)
+
+
+ 	def Logout(self,widget):
+ 		fi=open('.info.txt','w+')
+ 		fi.close()
+ 		Gtk.main_quit()
+ 	
 
 
  	def on_rating_changed(self, widget):
@@ -373,8 +377,7 @@ class MainBox(Gtk.Window):
 		
 		Gtk.Window.__init__(self, title="SemBegins!") #main window
 		# self.set_default_size(200, 100) #setting default size
-		self.set_border_width(10)		
-
+		self.set_border_width(10)	
 		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 		label = Gtk.Label("Enter Your Roll Number:")
 		vbox.pack_start(label, True, True, 0)
@@ -383,11 +386,15 @@ class MainBox(Gtk.Window):
 		self.entry.set_max_length(9) 
 		self.entry.set_text("140101063") #default text value
 		vbox.pack_start(self.entry, True, True, 0)
+		fi.write(self.entry.get_text())
 
 		button = Gtk.Button(label="Submit")
 		button.connect("clicked", self.buttonClicked) #button click event
 		vbox.pack_start(button, True, True, 0)
 		self.add(vbox)
+		
+
+		
 
 	def buttonClicked(self, widget):
 		self.roll=self.entry.get_text()
@@ -395,7 +402,16 @@ class MainBox(Gtk.Window):
 		self.dept=depFinder(self.roll)
 		displayResult(self.dept, self.sem, self.roll)
 
-win = MainBox() #calling the mainbox
-win.connect("delete-event", Gtk.main_quit) #adding the quit event listener
-win.show_all()
-Gtk.main()
+
+fi=open(".info.txt",'r+')
+line=fi.readline()
+
+if line == '':
+	win = MainBox() #calling the mainbox
+	win.connect("delete-event", Gtk.main_quit) #adding the quit event listener
+	win.show_all()
+	Gtk.main()
+else:
+	displayResult(depFinder(line),semFinder(line),line)
+
+fi.close();
