@@ -5,6 +5,7 @@ from exam import listTT
 from notes import uploadFile, listUploads, downloadFile
 from Tkinter import Tk
 from tkFileDialog import askopenfilename
+import webbrowser
 
 def semFinder(roll): #simple function to parse the roll number and get sem
 	a=str(roll)
@@ -50,32 +51,49 @@ class MainNotebook(Gtk.Window):
 			books_list_store.append(list(book))
 
 		books_tree_view = Gtk.TreeView(books_list_store) #adding to treeview
+	
 
 		#adding columns
 		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability"]):
 			renderer = Gtk.CellRendererText()
+			renderer.set_fixed_size(-1,50)
 			renderer.set_property('editable', True)
+			
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
+			column.add_attribute(renderer, "markup", i) 
 			if i!=1:
 				column.set_max_width(250)
 				column.set_resizable(True)
 				column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
 				column.set_fixed_width(150)
-			column.set_sort_column_id(i) #allowing sortable columns
+			# column.set_sort_column_id(i) #allowing sortable columns
 			books_tree_view.append_column(column) 
-			
+		
 
 		
 
 		self.page1.pack_start(books_tree_view, True, True, 0)
 
-		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+
+
+
+		padding_box=Gtk.Box()
+		padding_box.set_size_request(20,20)
+		vbox.pack_start(padding_box, False, False, 0)
+
 
 		for book in courseBooks:
-			button = Gtk.LinkButton(book[6],label="Download")
-			vbox.pack_start(button, True, True, 0)
+			if book[6]=="None":
+				button = Gtk.LinkButton(book[6],label="Not Available")
+				button.set_size_request(20,54)
+				vbox.pack_start(button, False, False, 0)
+			else:
+				button = Gtk.LinkButton(book[6],label="Download")
+				button.set_size_request(20,54)
+				vbox.pack_start(button, False, False, 0)
 
-		self.page1.pack_start(vbox,True,True,0)
+		self.page1.pack_start(vbox,False,False,0)
 
 		self.notebook.append_page(self.page1, Gtk.Label('Books Info'))
 		#adding books page
@@ -171,6 +189,16 @@ class MainNotebook(Gtk.Window):
 		self.page4.pack_start(grid, True, True, 0)
 		self.notebook.append_page(self.page4, Gtk.Label('Notes'))
 
+	# def on_treeview_click(self, treeview, path, view_column):
+ #        model=treeview.get_model()
+ #        action_id=model[path][0]
+ #        url='....' # build your url
+ #        webbrowser.open(url)
+ 	def on_treeview_click(self, treeview,path,view_column):
+ 		model=treeview.get_model()
+ 		action_id=model[path][0]
+ 		url="https://www.google.com"
+ 		webbrowser.open(url)
 
 	def on_course_combo_changed(self, combo):
 		self.updateFileList()
