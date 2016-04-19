@@ -26,6 +26,9 @@ def displayResult(dept, sem, roll): #result display fuction
 	win = MainNotebook(dept,sem,roll) #calling notebookview
 	win.connect("delete-event", Gtk.main_quit)
 	win.show_all()
+	win.textBox.hide()
+	win.rating_combo.hide()
+	win.button_rating.hide()
 	Gtk.main()
 
 
@@ -165,10 +168,26 @@ class MainNotebook(Gtk.Window):
 
 		self.course_combo.set_active(0)
 
+		self.rating_combo = Gtk.ComboBoxText()
+		self.rating_combo.set_entry_text_column(0)
+
+		for i in range(1,6):
+			self.rating_combo.append_text(str(i))
+		self.rating_combo.connect('changed', self.on_rating_changed)
+
+		self.rating_combo.set_active(4)	
+
 		buttonbox = Gtk.ButtonBox(Gtk.Orientation.HORIZONTAL)
 		buttonbox.set_layout(Gtk.ButtonBoxStyle.EDGE)
-
+		self.textBox = Gtk.Label("Rating For the File:")
 		buttonbox.add(self.course_combo)
+		buttonbox.add(self.textBox)
+		buttonbox.add(self.rating_combo)
+
+	
+		self.button_rating = Gtk.Button("Submit Rating")
+		self.button_rating.connect("clicked", self.on_rating_submit)
+		buttonbox.add(self.button_rating)
 	
 		button_choose_file = Gtk.Button("Choose File")
 		button_choose_file.connect("clicked", self.on_file_clicked)
@@ -204,6 +223,16 @@ class MainNotebook(Gtk.Window):
  		Gtk.main_quit()
  	
 
+
+ 	def on_rating_changed(self, widget):
+ 		pass	
+ 	def on_rating_submit(self,widget):
+ 		self.button_rating.hide()
+ 		# self.textBox.hide()
+ 		self.rating_combo.hide()
+ 		self.textBox.set_text("Thanks for your rating!")
+ 		pass
+
 	def on_course_combo_changed(self, combo):
 		self.updateFileList()
 		index = combo.get_active()
@@ -224,6 +253,9 @@ class MainNotebook(Gtk.Window):
 			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
 			# print self.activeFilename,location,self.activeRoll
 		dialog.destroy()
+		self.button_rating.show()
+		self.textBox.show()
+		self.rating_combo.show()
 
 
 	def on_upload_clicked(self, widget,roll):
