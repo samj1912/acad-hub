@@ -45,19 +45,22 @@ class MainNotebook(Gtk.Window):
 		courseBooks = showBooks(dept, sem) #getting an array of coursebooks and rel. info
 		self.page1 = Gtk.Box() 
 		self.page1.set_border_width(10)
-		books_list_store = Gtk.ListStore(str, str, str, str, str, str, str) #new liststore for books
+		books_list_store = Gtk.ListStore(str, str, str, str, str, str,str) #new liststore for books
 		for book in courseBooks:
 			books_list_store.append(list(book))
 
 		books_tree_view = Gtk.TreeView(books_list_store) #adding to treeview
 
 		#adding columns
-		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability", "Download link"]):
+		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability"]):
 			renderer = Gtk.CellRendererText()
 			renderer.set_property('editable', True)
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
-			column.set_max_width(150)
-			column.set_resizable(True)
+			if i!=1:
+				column.set_max_width(250)
+				column.set_resizable(True)
+				column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+				column.set_fixed_width(150)
 			column.set_sort_column_id(i) #allowing sortable columns
 			books_tree_view.append_column(column) 
 			
