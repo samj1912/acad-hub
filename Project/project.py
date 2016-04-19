@@ -32,7 +32,9 @@ class MainNotebook(Gtk.Window):
 
 	def __init__(self,dept="CSE",sem=3,roll='140101063'):
 		Gtk.Window.__init__(self, title="Acad-Hub")
-		self.set_default_size(300, 300)
+		# self.set_resizable(True)
+		# self.maximize()
+		# self.set_default_size(300, 300)
 		self.set_position(Gtk.WindowPosition.CENTER)
 		self.set_border_width(10)
 
@@ -43,19 +45,38 @@ class MainNotebook(Gtk.Window):
 		courseBooks = showBooks(dept, sem) #getting an array of coursebooks and rel. info
 		self.page1 = Gtk.Box() 
 		self.page1.set_border_width(10)
-		books_list_store = Gtk.ListStore(str, str, str, str, str, str, str) #new liststore for books
+		books_list_store = Gtk.ListStore(str, str, str, str, str, str,str) #new liststore for books
 		for book in courseBooks:
 			books_list_store.append(list(book))
 
 		books_tree_view = Gtk.TreeView(books_list_store) #adding to treeview
+
 		#adding columns
-		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability", "Download link"]):
+		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability"]):
 			renderer = Gtk.CellRendererText()
+			renderer.set_property('editable', True)
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
+			if i!=1:
+				column.set_max_width(250)
+				column.set_resizable(True)
+				column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+				column.set_fixed_width(150)
 			column.set_sort_column_id(i) #allowing sortable columns
 			books_tree_view.append_column(column) 
+			
+
+		
 
 		self.page1.pack_start(books_tree_view, True, True, 0)
+
+		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+
+		for book in courseBooks:
+			button = Gtk.LinkButton(book[6],label="Download")
+			vbox.pack_start(button, True, True, 0)
+
+		self.page1.pack_start(vbox,True,True,0)
+
 		self.notebook.append_page(self.page1, Gtk.Label('Books Info'))
 		#adding books page
 
@@ -67,9 +88,11 @@ class MainNotebook(Gtk.Window):
 			exams_list_store.append(list(exam))
 
 		exams_tree_view = Gtk.TreeView(exams_list_store)
+		exams_tree_view.columns_autosize()
 
 		for i, col_title in enumerate(["Course", "Course Name","Day","End-Sem Date","End-Sem Day", "Venue"]): #rendering data
 			renderer = Gtk.CellRendererText()
+
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
 			column.set_sort_column_id(i)
 
@@ -90,6 +113,7 @@ class MainNotebook(Gtk.Window):
 
 		for i, col_title in enumerate(["Course-Code", "Course Name", "L", "T", "P" , "C"]):
 			renderer = Gtk.CellRendererText()
+
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
 			column.set_sort_column_id(i)
 			course_tree_view.append_column(column)
@@ -237,6 +261,8 @@ class MainNotebook(Gtk.Window):
 
 		renderer_text = Gtk.CellRendererText(weight=600)
 		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
 		column_text = Gtk.TreeViewColumn('Filename', renderer_text, text=1)
 		column_text.set_sort_column_id(1)
 		column_text.set_alignment(0.5)
@@ -244,6 +270,8 @@ class MainNotebook(Gtk.Window):
 
 		renderer_text = Gtk.CellRendererText(weight=600)
 		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
 		column_text = Gtk.TreeViewColumn('Uploaded By', renderer_text, text=2)
 		# column_text.set_sort_column_id(1)
 		column_text.set_alignment(0.5)
@@ -251,6 +279,8 @@ class MainNotebook(Gtk.Window):
 
 		renderer_text = Gtk.CellRendererText()
 		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
 		column_text = Gtk.TreeViewColumn('Upload time', renderer_text, text=3)
 		column_text.set_sort_column_id(3)
 		column_text.set_alignment(0.5)
@@ -282,7 +312,7 @@ class MainBox(Gtk.Window):
 	def __init__(self):
 		
 		Gtk.Window.__init__(self, title="SemBegins!") #main window
-		self.set_default_size(200, 100) #setting default size
+		# self.set_default_size(200, 100) #setting default size
 		self.set_border_width(10)		
 
 		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
