@@ -16,5 +16,11 @@ class unitTester(unittest.TestCase):
     	for i in range(len(Rollnumber)):
         	self.assertEqual(depFinder(Rollnumber[i]), Department[i]) #assertEqual(a,b) = assertEqual(a==b)
 
+    def test_is_uploading(self):
+    	with open("test.txt","w") as f:
+   			f.write("Test")
+   			self.assertEqual(uploadFile("test.txt","100101001","TEST"),200)
+   			os.remove("test.txt")
+
 if __name__ == '__main__':
     unittest.main()
