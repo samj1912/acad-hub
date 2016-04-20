@@ -382,7 +382,9 @@ class MainNotebook(Gtk.Window):
 		if response == Gtk.ResponseType.OK:
 			location = dialog.get_filename()
 			activeCourse = self.courseList[self.course_combo.get_active()]
-			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
+			# downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
+			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll, self.rating)
+
 		dialog.destroy()
 		self.button_rating.show()
 		self.textBox.show()
