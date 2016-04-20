@@ -16,5 +16,50 @@ class unitTester(unittest.TestCase):
     	for i in range(len(Rollnumber)):
         	self.assertEqual(depFinder(Rollnumber[i]), Department[i]) #assertEqual(a,b) = assertEqual(a==b)
 
+    def test_is_uploading(self):
+    	with open("test.txt","w") as f:
+   			f.write("Test")
+   			self.assertEqual(uploadFile("test.txt","100101001","TEST"),200)
+   			os.remove("test.txt")
+
+   	def test_is_listing(self):
+   		self.assertEqual(listUploads("TEST")[1][0],"test.txt")
+
+
+   	def test_is_downloading(self):
+   		downloadFile('test.txt','/home/sam/Desktop/bkp/team10cs243','TEST',"100101001","0.00(0)")	
+   		x=""
+   		with open("../test.txt","r") as f:
+ 			for i in f:
+ 				x=i
+ 		self.assertEqual(x,"Test")
+ 		os.remove("../test.txt")
+
+ 	def test_courses(self):
+		depts = ["CSE","ECE","ME","CE","bdes","BT","CL","EEE","EPh","CST","MC"]
+		with open("course.json", 'r') as f:
+			data = json.load(f)
+		j = 0
+		for dept in depts:
+			for i in range(1,9):
+				self.assertEqual(showBooks(dept, i, "courses"), data[j])
+				j += 1
+
+
+
+	def test_course_books(self):
+		depts = ["CSE","ECE","ME","CE","bdes","BT","CL","EEE","EPh","CST","MC"]
+		with open("books.json", 'r') as f:
+			data = json.load(f)
+		j = 0
+		for dept in depts:
+			for i in range(1,9):
+				x = showBooks(dept, i, "books")
+				y = []
+				for i in x:
+					y.append(list(i))
+				self.assertEqual(y, data[j])
+				j += 1
+
 if __name__ == '__main__':
     unittest.main()
