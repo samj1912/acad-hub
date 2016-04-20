@@ -78,7 +78,9 @@ def getCourseBooks(courses, soup):
 	strippedRows = []
 	for row in rows:
 		strippedRows.append(stripAll(row.text))
-
+	# for row in rows:
+	spans = rows[2].findAll('span', {'style':'font-size:10.0pt'+'*'})
+	# print spans 
 	courseBooks = [] # list of all the relevant course books
 	for course in courses:
 		for i in range(len(rows)):
@@ -170,3 +172,5 @@ def showBooks(dept, sem, find="books"):
 		return courseList
 	else:						# Return all the relevant course books
 		return getCourseBooks(courses, soup) 
+
+# print showBooks("ECE", 1, "books")
