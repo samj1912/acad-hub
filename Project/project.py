@@ -254,6 +254,7 @@ class MainNotebook(Gtk.Window):
 		lendButtonBox.add(self.button_lend)
 
 		self.contact_field = Gtk.Entry()
+		self.contact_field.set_placeholder_text("Your mobile number")
 		lendButtonBox.add(self.contact_field)
 
 		self.button_submit_lend = Gtk.Button("Submit")
