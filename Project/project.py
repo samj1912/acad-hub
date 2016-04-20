@@ -221,6 +221,9 @@ class MainNotebook(Gtk.Window):
  		fi=open('.info.txt','w+')
  		fi.close()
  		Gtk.main_quit()
+ 		self.destroy()
+
+
  	
 
 
@@ -354,8 +357,7 @@ class MainNotebook(Gtk.Window):
 
 		tree_selection.connect("changed", self.getSelectedFileDetails)
 
-		self.scrolledwindow.add_with_viewport(self.treeview)  
-
+		self.scrolledwindow.add_with_viewport(self.treeview)
 	# def on_folder_clicked(self, widget):
 	#     dialog = Gtk.FileChooserDialog("Please choose a folder", self,
 	#         Gtk.FileChooserAction.SELECT_FOLDER,
@@ -384,7 +386,7 @@ class MainBox(Gtk.Window):
 		
 		self.entry = Gtk.Entry() #entry box
 		self.entry.set_max_length(9) 
-		self.entry.set_text("140101063") #default text value
+		self.entry.set_text("140101001") #default text value
 		vbox.pack_start(self.entry, True, True, 0)
 		fi.write(self.entry.get_text())
 
@@ -393,7 +395,7 @@ class MainBox(Gtk.Window):
 		vbox.pack_start(button, True, True, 0)
 		self.add(vbox)
 		
-
+		fi.close()
 		
 
 	def buttonClicked(self, widget):
@@ -413,5 +415,4 @@ if line == '':
 	Gtk.main()
 else:
 	displayResult(depFinder(line),semFinder(line),line)
-
-fi.close();
+	fi.close()
