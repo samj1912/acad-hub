@@ -35,5 +35,15 @@ class unitTester(unittest.TestCase):
  		self.assertEqual(x,"Test")
  		os.remove("../test.txt")
 
+ 	def test_courses(self):
+		depts = ["CSE","ECE","ME","CE","bdes","BT","CL","EEE","EPh","CST","MC"]
+		with open("course.json", 'r') as f:
+			data = json.load(f)
+		j = 0
+		for dept in depts:
+			for i in range(1,9):
+				self.assertEqual(showBooks(dept, i, "courses"), data[j])
+				j += 1
+
 if __name__ == '__main__':
     unittest.main()
