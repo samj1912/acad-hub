@@ -5,7 +5,7 @@ from notes import uploadFile, listUploads, downloadFile ,rateFile
 from bookLending import *
 import webbrowser
 from details import semFinder, depFinder
-from tools import sanitize_roll_number
+from tools import sanitize_roll_number, sanitize_phone_number
 
 def stripAll(text):
 	strippedText = ''.join(text.split())
@@ -24,6 +24,7 @@ def displayResult(dept, sem, roll): #result display fuction
 	win.button_submit_lend.hide()
 	win.contact_field.hide()
 	win.button_delete.hide()
+	win.contact_label.hide()
 	Gtk.main()
 
 
@@ -249,9 +250,15 @@ class MainNotebook(Gtk.Window):
 		self.button_lend.connect("clicked", self.on_lend_clicked)
 		lendButtonBox.add(self.button_lend)
 
+
+		self.contact_label = Gtk.Label("Enter your phone number")
+		lendButtonBox.add(self.contact_label)
+
 		self.contact_field = Gtk.Entry()
-		self.contact_field.set_placeholder_text("Your mobile number")
+		# self.contact_field.set_placeholder_text("Your mobile number")
+		self.contact_field.set_max_length(10)
 		lendButtonBox.add(self.contact_field)
+
 
 		self.button_submit_lend = Gtk.Button("Submit")
 		self.button_submit_lend.connect("clicked", self.on_submit_lend_clicked)
@@ -331,6 +338,7 @@ class MainNotebook(Gtk.Window):
  		try:
 	 		self.button_lend.hide()
 	 		self.contact_field.hide()
+	 		self.contact_label.hide()
 	 		self.button_submit_lend.hide()
 	 	except:
 	 		pass
@@ -338,6 +346,7 @@ class MainNotebook(Gtk.Window):
  	def showLending(self):
  		try:
 	 		self.button_lend.show()
+	 		self.contact_label.hide()
 	 		self.contact_field.hide()
 	 		self.button_submit_lend.hide()
 	 	except:
@@ -353,17 +362,23 @@ class MainNotebook(Gtk.Window):
 			pass
 
  	def on_submit_lend_clicked(self, widget):
- 		lendBook(self.roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
- 		self.updateLendList()
- 		self.hideLending()
+ 		if sanitize_phone_number(self.contact_field.get_text()):		
+	 		self.contact_label.set_text("Enter your phone number")
+	 		lendBook(self.roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+	 		self.updateLendList()
+	 		self.hideLending()
+	 	else:
+	 		self.contact_label.set_text("Please enter valid phone number")
 
  	def on_lend_clicked(self, widget):
  		self.button_lend.hide()
+ 		self.contact_label.show()
  		self.contact_field.show()
  		self.button_submit_lend.show()
 
  	def on_delete_clicked(self, widget):
  		deleteLender(self.roll, self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+ 		self.button_delete.hide()
  		self.updateLendList()
 
 

@@ -10,7 +10,7 @@ def sanitize_roll_number(roll):
 
 
 def sanitize_phone_number(phone):
-	if len(phone) != 9 or not phone.isdigit():
+	if len(phone) != 10 or not phone.isdigit():
 		return False
 
 	return True
