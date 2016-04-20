@@ -3,8 +3,7 @@ from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
 from notes import uploadFile, listUploads, downloadFile
-from Tkinter import Tk
-from tkFileDialog import askopenfilename
+from bookLending import *
 import webbrowser
 
 def semFinder(roll): #simple function to parse the roll number and get sem
@@ -226,7 +225,7 @@ class MainNotebook(Gtk.Window):
 		self.books_combo = Gtk.ComboBoxText()
 		self.books_combo.set_entry_text_column(0)
 		self.books = courseBooks
-
+		self.roll = roll
 		self.course_combo2 = Gtk.ComboBoxText()
 		self.course_combo2.set_entry_text_column(0)
 		for course in self.courseList:
@@ -253,7 +252,7 @@ class MainNotebook(Gtk.Window):
 		lendButtonBox.add(self.contact_field)
 
 		self.button_submit_lend = Gtk.Button("Submit")
-		self.button_submit_lend.connect("clicked", self.on_submit_lend_clicked)
+		self.button_submit_lend.connect("clicked", self.on_submit_lend_clicked, roll)
 		lendButtonBox.add(self.button_submit_lend)
 
 		self.updateLendList()
@@ -275,10 +274,23 @@ class MainNotebook(Gtk.Window):
  #        action_id=model[path][0]
  #        url='....' # build your url
  #        webbrowser.open(url)
- 	def on_submit_lend_clicked(self, widget):
+ 	def hideLending(self):
  		self.button_lend.hide()
  		self.contact_field.hide()
  		self.button_submit_lend.hide()
+
+ 	def showLending(self):
+ 		try:
+	 		self.button_lend.show()
+	 		self.contact_field.hide()
+	 		self.button_submit_lend.hide()
+	 	except:
+	 		pass
+
+ 	def on_submit_lend_clicked(self, widget, roll):
+ 		lendBook(roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+ 		self.updateLendList()
+ 		self.hideLending()
 
  	def on_lend_clicked(self, widget):
  		self.button_lend.hide()
@@ -448,11 +460,16 @@ class MainNotebook(Gtk.Window):
 
 
 	def updateLendList(self):
-		# rolls, contacts = listLenders(self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+		rolls, contacts = listLenders(self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
 		self.liststore_lend.clear()
-		# for roll,contact in zip(rolls,contacts):
-		# 	self.liststore_lend.append([roll, contact])
-		self.liststore_lend.append(['140101039', '2554'])
+		for roll,contact in zip(rolls,contacts):
+			self.liststore_lend.append([roll, contact])
+		
+		if self.roll in rolls:
+			self.hideLending()
+		else:
+			self.showLending()
+		
 		treeview = Gtk.TreeView(model=self.liststore_lend)
 		treeview.set_hexpand(True)
 		treeview.set_vexpand(True)
@@ -476,21 +493,6 @@ class MainNotebook(Gtk.Window):
 
 		self.lendingwindow.add_with_viewport(treeview)
 
-
-	# def on_folder_clicked(self, widget):
-	#     dialog = Gtk.FileChooserDialog("Please choose a folder", self,
-	#         Gtk.FileChooserAction.SELECT_FOLDER,
-	#         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-	#          "Select", Gtk.ResponseType.OK))
-	#     dialog.set_default_size(800, 400)
-
-	#     response = dialog.run()
-	#     if response == Gtk.ResponseType.OK:
-	#         print("Select clicked")
-	#         print("Folder selected: " + dialog.get_filename())
-	#     elif response == Gtk.ResponseType.CANCEL:
-	#         print("Cancel clicked")
-	#     dialog.destroy()
 
 class MainBox(Gtk.Window):
 
