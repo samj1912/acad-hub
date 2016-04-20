@@ -20,5 +20,14 @@ def listLenders(course, book):
 		contacts.append(i[9:19])
 	return rolls, contacts
 
+def deleteLender(roll, course, book):
+	url = 'http://10.0.2.22/deletelenders.php'
+	data = {'course':course, 'book':book, 'roll':roll}
+	r = requests.post(url, data=data)
+	response = r.text
+	if response == "Yes":
+		print "Yo"
 
-listLenders('CS204', 'Introduction to Algorithms')
+
+# listLenders('CS204', 'Introduction to Algorithms')
+# deleteLender('140101063', 'CS204', 'Introduction to Algorithms')

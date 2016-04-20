@@ -28,8 +28,10 @@ def displayResult(dept, sem, roll): #result display fuction
 	win.textBox.hide()
 	win.rating_combo.hide()
 	win.button_rating.hide()
+	win.button_lend.hide()
 	win.button_submit_lend.hide()
 	win.contact_field.hide()
+	win.button_delete.hide()
 	Gtk.main()
 
 
@@ -224,8 +226,11 @@ class MainNotebook(Gtk.Window):
 
 		self.books_combo = Gtk.ComboBoxText()
 		self.books_combo.set_entry_text_column(0)
+		
 		self.books = courseBooks
 		self.roll = roll
+		self.activeLender = ""
+
 		self.course_combo2 = Gtk.ComboBoxText()
 		self.course_combo2.set_entry_text_column(0)
 		for course in self.courseList:
@@ -252,8 +257,12 @@ class MainNotebook(Gtk.Window):
 		lendButtonBox.add(self.contact_field)
 
 		self.button_submit_lend = Gtk.Button("Submit")
-		self.button_submit_lend.connect("clicked", self.on_submit_lend_clicked, roll)
+		self.button_submit_lend.connect("clicked", self.on_submit_lend_clicked)
 		lendButtonBox.add(self.button_submit_lend)
+
+		self.button_delete = Gtk.Button("Delete")
+		self.button_delete.connect("clicked", self.on_delete_clicked)
+		lendButtonBox.add(self.button_delete)
 
 		self.updateLendList()
 		grid.attach(self.lendingwindow, 0, 0, 1, 1)
@@ -274,10 +283,22 @@ class MainNotebook(Gtk.Window):
  #        action_id=model[path][0]
  #        url='....' # build your url
  #        webbrowser.open(url)
+ 	def on_rating_changed(self, widget):
+ 		pass	
+ 	def on_rating_submit(self,widget):
+ 		self.button_rating.hide()
+ 		# self.textBox.hide()
+ 		self.rating_combo.hide()
+ 		self.textBox.set_text("Thanks for your rating!")
+ 		pass
+
  	def hideLending(self):
- 		self.button_lend.hide()
- 		self.contact_field.hide()
- 		self.button_submit_lend.hide()
+ 		try:
+	 		self.button_lend.hide()
+	 		self.contact_field.hide()
+	 		self.button_submit_lend.hide()
+	 	except:
+	 		pass
 
  	def showLending(self):
  		try:
@@ -287,8 +308,17 @@ class MainNotebook(Gtk.Window):
 	 	except:
 	 		pass
 
- 	def on_submit_lend_clicked(self, widget, roll):
- 		lendBook(roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+	def checkForDelete(self):
+		try:
+			if self.activeLender == self.roll:
+				self.button_delete.show()
+			else:
+				self.button_delete.hide()
+		except:
+			pass
+
+ 	def on_submit_lend_clicked(self, widget):
+ 		lendBook(self.roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
  		self.updateLendList()
  		self.hideLending()
 
@@ -296,6 +326,10 @@ class MainNotebook(Gtk.Window):
  		self.button_lend.hide()
  		self.contact_field.show()
  		self.button_submit_lend.show()
+
+ 	def on_delete_clicked(self, widget):
+ 		deleteLender(self.roll, self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+ 		self.updateLendList()
 
 	def on_treeview_click(self, treeview,path,view_column):
 		model=treeview.get_model()
@@ -309,16 +343,6 @@ class MainNotebook(Gtk.Window):
  		fi.close()
  		Gtk.main_quit()
  	
-
-
- 	def on_rating_changed(self, widget):
- 		pass	
- 	def on_rating_submit(self,widget):
- 		self.button_rating.hide()
- 		# self.textBox.hide()
- 		self.rating_combo.hide()
- 		self.textBox.set_text("Thanks for your rating!")
- 		pass
 
 	def on_course_combo_changed(self, combo):
 		self.updateFileList()
@@ -334,11 +358,26 @@ class MainNotebook(Gtk.Window):
 		self.books_combo.set_active(0)
 		index = combo.get_active()
 		combo.set_active(index)
+		try:
+			self.button_delete.hide()
+		except:
+			pass
 
 	def on_books_combo_changed(self, combo):
 		self.updateLendList()
 		index = combo.get_active()
 		combo.set_active(index)
+		try:
+			self.button_delete.hide()
+		except:
+			pass
+
+	def getSelectedLenderDetails(self, tree_selection):
+		(model, pathlist) = tree_selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = model.get_iter(path)
+			self.activeLender = model.get_value(tree_iter,0)
+		self.checkForDelete()
 
 	def on_download_clicked(self,widget):
 		dialog = Gtk.FileChooserDialog("Please choose a folder", self,
@@ -350,10 +389,7 @@ class MainNotebook(Gtk.Window):
 		if response == Gtk.ResponseType.OK:
 			location = dialog.get_filename()
 			activeCourse = self.courseList[self.course_combo.get_active()]
-			# filename, roll = self.getSelectedFileDetails()
-			# print filename,roll
 			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
-			# print self.activeFilename,location,self.activeRoll
 		dialog.destroy()
 		self.button_rating.show()
 		self.textBox.show()
@@ -465,7 +501,7 @@ class MainNotebook(Gtk.Window):
 		for roll,contact in zip(rolls,contacts):
 			self.liststore_lend.append([roll, contact])
 		
-		if self.roll in rolls:
+		if self.roll in rolls or self.books_combo.get_active_text() is None:
 			self.hideLending()
 		else:
 			self.showLending()
@@ -490,6 +526,9 @@ class MainNotebook(Gtk.Window):
 		column_text = Gtk.TreeViewColumn('Contact no.', renderer_text, text=1)
 		column_text.set_alignment(0.5)
 		treeview.append_column(column_text)
+
+		tree_selection = treeview.get_selection()
+		tree_selection.connect("changed", self.getSelectedLenderDetails)
 
 		self.lendingwindow.add_with_viewport(treeview)
 
