@@ -200,9 +200,9 @@ class MainNotebook(Gtk.Window):
 		button_download.connect("clicked", self.on_download_clicked)
 		buttonbox.add(button_download)
 
-		tree_selection = self.treeview.get_selection()
-		tree_selection.connect("changed", self.getSelectedFileDetails)
-		tree_selection.connect("changed", self.checkForRating)
+		# tree_selection = self.treeview.get_selection()
+		# tree_selection.connect("changed", self.getSelectedFileDetails)
+		# tree_selection.connect("changed", self.checkForRating)
 
 		self.updateFileList()
 		grid.attach(self.scrolledwindow, 0, 0, 1, 1)
@@ -556,6 +556,7 @@ class MainNotebook(Gtk.Window):
 		tree_selection = self.treeview.get_selection()
 
 		tree_selection.connect("changed", self.getSelectedFileDetails)
+		tree_selection.connect("changed", self.checkForRating)
 
 		self.scrolledwindow.add_with_viewport(self.treeview)
 	# def on_folder_clicked(self, widget):
