@@ -103,8 +103,8 @@ def getCourseBooks(courses, soup):
 					author = row[:pos-2]
 					pub = row[pos+len(title)+1:]
 					# print title + "\t" + author + "\t" + pub
-					downloadLink = libgenSearch([removePunc(title), removePunc(author)])
-					libraryInfo = librarySearch([removePunc(title), getFirstAuthor(author)])
+					downloadLink = unicode(libgenSearch([removePunc(title), removePunc(author)]))
+					libraryInfo = unicode(librarySearch([removePunc(title), getFirstAuthor(author)]))
 					# print [removePunc(title), getFirstAuthor(author)]
 					courseBooks.append((course, courses[course]["code"], title, author, pub, libraryInfo, downloadLink))
 				 
@@ -155,13 +155,13 @@ def showBooks(dept, sem, find="books"):
 				continue
 			for j in range(0,6):
 				strippedText = splitAndJoin(td[j].text)
-				info.append(str(strippedText))
+				info.append(strippedText)
 		else:
 			if len(td)<=8 or stripAll(td[7].text) == "" and stripAll(td[8].text) == "":
 				continue
 			for j in range(7,len(td)):
 				strippedText = splitAndJoin(td[j].text)
-				info.append(str(strippedText))
+				info.append(strippedText)
 
 		info[0] = stripAll(info[0])
 		courses[info[1]] = {"code":info[0], "L":info[2], "T":info[3], "P":info[4], "C":info[5]}
