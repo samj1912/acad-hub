@@ -49,6 +49,11 @@ def downloadFile(filename, filepath, course, roll):
 		f.write(r.content)
 	print "Yayy!"
 
+
+def listLenders():
+	rolls = ['140101039', '140101025']
+	contacts = ['8011491725', '8455456556']
+	return rolls, contacts
 # downloadFile('EZ.txt', '/home/maulik/Desktop/test', 'CS203', '140101063')
 # listUploads("CS203")
 # uploadFile('exam.py')
