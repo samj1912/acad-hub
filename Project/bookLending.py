@@ -2,13 +2,13 @@ import requests
 
 
 def lendBook(roll, contact, course, book):
-	url = 'http://10.0.2.22/lendbook.php'
+	url = 'http://172.16.115.76/lendbook.php'
 	data = {'roll':roll, 'contact':contact, 'course':course, 'book':book}
 	r = requests.post(url, data=data)
 
 
 def listLenders(course, book):
-	url = 'http://10.0.2.22/listlenders.php'
+	url = 'http://172.16.115.76/listlenders.php'
 	data = {'course':course, 'book':book}
 	r = requests.post(url, data=data)
 
@@ -21,7 +21,7 @@ def listLenders(course, book):
 	return rolls, contacts
 
 def deleteLender(roll, course, book):
-	url = 'http://10.0.2.22/deletelenders.php'
+	url = 'http://172.16.115.76/deletelenders.php'
 	data = {'course':course, 'book':book, 'roll':roll}
 	r = requests.post(url, data=data)
 	response = r.text
