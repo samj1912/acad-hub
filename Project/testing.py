@@ -22,5 +22,8 @@ class unitTester(unittest.TestCase):
    			self.assertEqual(uploadFile("test.txt","100101001","TEST"),200)
    			os.remove("test.txt")
 
+   	def test_is_listing(self):
+   		self.assertEqual(listUploads("TEST")[1][0],"test.txt")
+
 if __name__ == '__main__':
     unittest.main()
