@@ -1,5 +1,7 @@
 import unittest
 from details import semFinder, depFinder
+from notes import *
+import os
 
 class unitTester(unittest.TestCase):
 
