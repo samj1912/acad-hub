@@ -7,10 +7,7 @@ def uploadFile(file, roll, course):
 	files = {'fileToUpload': open(file, 'rb')}
 	data = {'roll':roll, 'course':course}
 	r = requests.post(url, files=files, data=data)
-	if r.text == "Ok":
-		print "Your file has been uploaded successfully!"
-	else:
-		print "error while uploading"
+	return r.status_code	
 
 def listUploads(course):
 	url = 'http://172.16.115.76/listfiles.php'
@@ -58,21 +55,19 @@ def rateFile(filename, course, roll,ratingold, ratingnew):
 
 
 	data = {'course':course, 'file':filename, 'roll':roll,'ratingnew':ratnew,'rating':rating }
-	print data
 	r = requests.post(url, data=data)
-	print r.text
-	print r.status_code
-	print r.headers
+	return r.status_code
 
-	print "Yayy!"
 
-def downloadFile(filename, filepath, course, roll):
+def downloadFile(filename, filepath, course, roll,rating):
 	url = 'http://172.16.115.76/download.php'
-	data = {'course':course, 'file':filename, 'roll':roll}
+	rate = "_"+rating[0:4]+"_"+rating[5:-1]
+	data = {'course':course, 'file':filename, 'roll':roll,'rating':rate}
 	r = requests.post(url, data=data)
-	# print r.text
+
 	with open(filepath+'/'+filename, 'wb') as f:
 		f.write(r.content)
-	print "Yayy!"	
+
+	return r.status_code	
 
 
