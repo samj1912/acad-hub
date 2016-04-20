@@ -279,11 +279,12 @@ class MainNotebook(Gtk.Window):
 
 		self.add(WindowBox)
 
-	# def on_treeview_click(self, treeview, path, view_column):
- #        model=treeview.get_model()
- #        action_id=model[path][0]
- #        url='....' # build your url
- #        webbrowser.open(url)
+ 	def Logout(self,widget):
+ 		fi=open('.info.txt','w+')
+ 		fi.close()
+ 		Gtk.main_quit()
+ 		self.destroy()
+
  	def on_rating_changed(self, widget):
  		pass	
  	def on_rating_submit(self,widget):
@@ -509,6 +510,22 @@ class MainNotebook(Gtk.Window):
 
 		tree_selection.connect("changed", self.getSelectedFileDetails)
 
+		self.scrolledwindow.add_with_viewport(self.treeview)
+	# def on_folder_clicked(self, widget):
+	#     dialog = Gtk.FileChooserDialog("Please choose a folder", self,
+	#         Gtk.FileChooserAction.SELECT_FOLDER,
+	#         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+	#          "Select", Gtk.ResponseType.OK))
+	#     dialog.set_default_size(800, 400)
+
+	#     response = dialog.run()
+	#     if response == Gtk.ResponseType.OK:
+	#         print("Select clicked")
+	#         print("Folder selected: " + dialog.get_filename())
+	#     elif response == Gtk.ResponseType.CANCEL:
+	#         print("Cancel clicked")
+	#     dialog.destroy()
+
 		self.scrolledwindow.add_with_viewport(self.treeview)  
 
 
@@ -563,7 +580,7 @@ class MainBox(Gtk.Window):
 		
 		self.entry = Gtk.Entry() #entry box
 		self.entry.set_max_length(9) 
-		self.entry.set_text("140101063") #default text value
+		self.entry.set_text("140101001") #default text value
 		vbox.pack_start(self.entry, True, True, 0)
 		fi.write(self.entry.get_text())
 
@@ -572,7 +589,7 @@ class MainBox(Gtk.Window):
 		vbox.pack_start(button, True, True, 0)
 		self.add(vbox)
 		
-
+		fi.close()
 		
 
 	def buttonClicked(self, widget):
@@ -592,5 +609,4 @@ if line == '':
 	Gtk.main()
 else:
 	displayResult(depFinder(line),semFinder(line),line)
-
-fi.close();
+	fi.close()
