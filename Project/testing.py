@@ -1,6 +1,8 @@
 import unittest
 from details import semFinder, depFinder
 from notes import *
+from webcrawler import getCourseBooks, showBooks
+import json
 import os
 
 class unitTester(unittest.TestCase):
