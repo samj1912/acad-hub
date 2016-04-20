@@ -286,6 +286,7 @@ class MainNotebook(Gtk.Window):
  		self.button_rating.hide()
  		self.textBox.hide()
  		self.rating_combo.hide()
+ 		self.textBox.set_text("Rating For the File:")
  		notes=fd.readlines()
  		for line in notes:
  			# print line
@@ -294,7 +295,10 @@ class MainNotebook(Gtk.Window):
  				self.button_rating.show()
  				self.textBox.show()
  				self.rating_combo.show()
-
+ 			elif stripAll(line[:-2]) == stripAll(self.activeFilename + " " + self.courseList[self.course_combo.get_active()] + " " + self.activeRoll + " " + self.uploadTime):
+ 				self.textBox.set_text("Your rating : "+ line[-2])
+ 				self.textBox.show()
+ 			
 
  	def on_rating_changed(self, widget):
  		pass	
@@ -307,9 +311,10 @@ class MainNotebook(Gtk.Window):
  		start=0
  		line=fd.readline()
  		while line != '':
- 			if line==stripAll(self.activeFilename + " " + self.courseList[self.course_combo.get_active()] + " " + self.activeRoll + " " + self.uploadTime + "0"):
+ 			if stripAll(line)==stripAll(self.activeFilename + " " + self.courseList[self.course_combo.get_active()] + " " + self.activeRoll + " " + self.uploadTime + "0"):
  				fd.seek(start,0)
- 				fd.write(line[:-1]+str(ratingnew))
+ 				print line[:-2]+str(ratingnew)
+ 				fd.write(line[:-2]+str(ratingnew))
 
  			start=fd.tell()
  			line=fd.readline()
@@ -413,6 +418,7 @@ class MainNotebook(Gtk.Window):
 			activeCourse = self.courseList[self.course_combo.get_active()]
 			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
 			self.activeRating=0
+			fd.seek(0,2)
 			fd.write(stripAll(self.activeFilename + " " + activeCourse + " " + self.activeRoll + " " + self.uploadTime + " " + str(self.activeRating))+"\n")
 			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll, self.rating)
 
@@ -622,7 +628,7 @@ class MainBox(Gtk.Window):
 
 fi=open(".info.txt",'r+')
 line=fi.readline()
-fd=open(".download.txt", "a+")
+fd=open(".download.txt", "r+")
 
 if line == '':
 	win = MainBox() #calling the mainbox
