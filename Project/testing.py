@@ -45,5 +45,21 @@ class unitTester(unittest.TestCase):
 				self.assertEqual(showBooks(dept, i, "courses"), data[j])
 				j += 1
 
+
+
+	def test_course_books(self):
+		depts = ["CSE","ECE","ME","CE","bdes","BT","CL","EEE","EPh","CST","MC"]
+		with open("books.json", 'r') as f:
+			data = json.load(f)
+		j = 0
+		for dept in depts:
+			for i in range(1,9):
+				x = showBooks(dept, i, "books")
+				y = []
+				for i in x:
+					y.append(list(i))
+				self.assertEqual(y, data[j])
+				j += 1
+
 if __name__ == '__main__':
     unittest.main()
