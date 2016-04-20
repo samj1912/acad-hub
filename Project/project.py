@@ -2,7 +2,7 @@ from gi.repository import Gtk, GObject, GdkPixbuf
 from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
-from notes import uploadFile, listUploads, downloadFile
+from notes import uploadFile, listUploads, downloadFile ,rateFile
 from Tkinter import Tk
 from tkFileDialog import askopenfilename
 import webbrowser
@@ -151,7 +151,7 @@ class MainNotebook(Gtk.Window):
 		self.scrolledwindow.set_policy(Gtk.PolicyType.NEVER,
 									   Gtk.PolicyType.AUTOMATIC)
 
-		self.liststore_files = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str)
+		self.liststore_files = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, str)
 
 
 		self.course_combo = Gtk.ComboBoxText()
@@ -159,6 +159,7 @@ class MainNotebook(Gtk.Window):
 		self.courseList = []
 		self.activeFilename = ""
 		self.activeRoll = ""
+		self.rating = ""
 		for course in courses:
 			self.courseList.append(str(course[0]))
 		for course in self.courseList:
@@ -223,10 +224,15 @@ class MainNotebook(Gtk.Window):
  	def on_rating_changed(self, widget):
  		pass	
  	def on_rating_submit(self,widget):
+ 		
+ 		activeCourse = self.courseList[self.course_combo.get_active()]
+ 		ratingnew = self.rating_combo.get_active()+1
+ 		print ratingnew
+ 		rateFile(self.activeFilename,activeCourse,self.activeRoll, self.rating,ratingnew)
  		self.button_rating.hide()
- 		# self.textBox.hide()
  		self.rating_combo.hide()
  		self.textBox.set_text("Thanks for your rating!")
+ 		self.updateFileList()
  		pass
 
 	def on_course_combo_changed(self, combo):
@@ -301,14 +307,16 @@ class MainNotebook(Gtk.Window):
 			tree_iter = model.get_iter(path)
 			self.activeFilename = model.get_value(tree_iter,1)
 			self.activeRoll = model.get_value(tree_iter,2)
+			self.rating = model.get_value(tree_iter,3)
 
 
 	def updateFileList(self):
-		pics_list,pics_name,uploader_list,upload_time = listUploads(self.courseList[self.course_combo.get_active()])
+		pics_list,pics_name,uploader_list,upload_time ,rating = listUploads(self.courseList[self.course_combo.get_active()])
 		self.liststore_files.clear()
-		for name, pic, uploader, time in zip(pics_name, pics_list, uploader_list, upload_time):
+		for name, pic, uploader, time , rating in zip(pics_name, pics_list, uploader_list, upload_time ,rating):
 			pxbf = GdkPixbuf.Pixbuf.new_from_file_at_scale(pic, 50, 50, True)
-			self.liststore_files.append([pxbf, name, uploader, time])
+
+			self.liststore_files.append([pxbf, name, uploader, rating, time])
 
 		self.treeview = Gtk.TreeView(model=self.liststore_files)
 		self.treeview.set_hexpand(True)
@@ -341,7 +349,16 @@ class MainNotebook(Gtk.Window):
 		renderer_text.set_fixed_size(200, -1)
 		renderer_text.set_alignment(0.5,0.5)
 
-		column_text = Gtk.TreeViewColumn('Upload time', renderer_text, text=3)
+		column_text = Gtk.TreeViewColumn('Rating', renderer_text, text=3)
+		column_text.set_sort_column_id(3)
+		column_text.set_alignment(0.5)
+		self.treeview.append_column(column_text)
+
+		renderer_text = Gtk.CellRendererText()
+		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
+		column_text = Gtk.TreeViewColumn('Upload time', renderer_text, text=4)
 		column_text.set_sort_column_id(3)
 		column_text.set_alignment(0.5)
 		self.treeview.append_column(column_text)      
