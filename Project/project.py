@@ -5,7 +5,7 @@ from notes import uploadFile, listUploads, downloadFile ,rateFile
 from bookLending import *
 import webbrowser
 from details import semFinder, depFinder
-
+from tools import sanitize_roll_number, sanitize_phone_number
 
 def stripAll(text):
 	strippedText = ''.join(text.split())
@@ -24,6 +24,7 @@ def displayResult(dept, sem, roll): #result display fuction
 	win.button_submit_lend.hide()
 	win.contact_field.hide()
 	win.button_delete.hide()
+	win.contact_label.hide()
 	Gtk.main()
 
 
@@ -200,10 +201,6 @@ class MainNotebook(Gtk.Window):
 		button_download.connect("clicked", self.on_download_clicked)
 		buttonbox.add(button_download)
 
-		# tree_selection = self.treeview.get_selection()
-		# tree_selection.connect("changed", self.getSelectedFileDetails)
-		# tree_selection.connect("changed", self.checkForRating)
-
 		self.updateFileList()
 		grid.attach(self.scrolledwindow, 0, 0, 1, 1)
 		grid.attach_next_to(buttonbox, self.scrolledwindow,
@@ -253,9 +250,15 @@ class MainNotebook(Gtk.Window):
 		self.button_lend.connect("clicked", self.on_lend_clicked)
 		lendButtonBox.add(self.button_lend)
 
+
+		self.contact_label = Gtk.Label("Enter your phone number")
+		lendButtonBox.add(self.contact_label)
+
 		self.contact_field = Gtk.Entry()
-		self.contact_field.set_placeholder_text("Your mobile number")
+		# self.contact_field.set_placeholder_text("Your mobile number")
+		self.contact_field.set_max_length(10)
 		lendButtonBox.add(self.contact_field)
+
 
 		self.button_submit_lend = Gtk.Button("Submit")
 		self.button_submit_lend.connect("clicked", self.on_submit_lend_clicked)
@@ -335,6 +338,7 @@ class MainNotebook(Gtk.Window):
  		try:
 	 		self.button_lend.hide()
 	 		self.contact_field.hide()
+	 		self.contact_label.hide()
 	 		self.button_submit_lend.hide()
 	 	except:
 	 		pass
@@ -342,6 +346,7 @@ class MainNotebook(Gtk.Window):
  	def showLending(self):
  		try:
 	 		self.button_lend.show()
+	 		self.contact_label.hide()
 	 		self.contact_field.hide()
 	 		self.button_submit_lend.hide()
 	 	except:
@@ -357,17 +362,23 @@ class MainNotebook(Gtk.Window):
 			pass
 
  	def on_submit_lend_clicked(self, widget):
- 		lendBook(self.roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
- 		self.updateLendList()
- 		self.hideLending()
+ 		if sanitize_phone_number(self.contact_field.get_text()):		
+	 		self.contact_label.set_text("Enter your phone number")
+	 		lendBook(self.roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+	 		self.updateLendList()
+	 		self.hideLending()
+	 	else:
+	 		self.contact_label.set_text("Please enter valid phone number")
 
  	def on_lend_clicked(self, widget):
  		self.button_lend.hide()
+ 		self.contact_label.show()
  		self.contact_field.show()
  		self.button_submit_lend.show()
 
  	def on_delete_clicked(self, widget):
  		deleteLender(self.roll, self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+ 		self.button_delete.hide()
  		self.updateLendList()
 
 
@@ -628,23 +639,29 @@ class MainBox(Gtk.Window):
 		
 		self.entry = Gtk.Entry() #entry box
 		self.entry.set_max_length(9) 
-		self.entry.set_text("140101001") #default text value
 		vbox.pack_start(self.entry, True, True, 0)
-		fi.write(self.entry.get_text())
 
 		button = Gtk.Button(label="Submit")
 		button.connect("clicked", self.buttonClicked) #button click event
 		vbox.pack_start(button, True, True, 0)
+
+		self.label = Gtk.Label("Please Enter valid roll number")
+		vbox.pack_start(self.label, True, True, 0)
 		self.add(vbox)
 		
-		fi.close()
 		
 
 	def buttonClicked(self, widget):
 		self.roll=self.entry.get_text()
-		self.sem=semFinder(self.roll)
-		self.dept=depFinder(self.roll)
-		displayResult(self.dept, self.sem, self.roll)
+		if sanitize_roll_number(self.roll):
+			self.sem=semFinder(self.roll)
+			self.dept=depFinder(self.roll)
+			self.label.hide()
+			fi.write(self.entry.get_text())
+			fi.close()
+			displayResult(self.dept, self.sem, self.roll)
+		else:
+			self.label.show()
 
 
 fi=open(".info.txt",'r+')
@@ -655,6 +672,7 @@ if line == '':
 	win = MainBox() #calling the mainbox
 	win.connect("delete-event", Gtk.main_quit) #adding the quit event listener
 	win.show_all()
+	win.label.hide()
 	Gtk.main()
 else:
 	fi.close()
