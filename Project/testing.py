@@ -25,5 +25,15 @@ class unitTester(unittest.TestCase):
    	def test_is_listing(self):
    		self.assertEqual(listUploads("TEST")[1][0],"test.txt")
 
+
+   	def test_is_downloading(self):
+   		downloadFile('test.txt','/home/sam/Desktop/bkp/team10cs243','TEST',"100101001","0.00(0)")	
+   		x=""
+   		with open("../test.txt","r") as f:
+ 			for i in f:
+ 				x=i
+ 		self.assertEqual(x,"Test")
+ 		os.remove("../test.txt")
+
 if __name__ == '__main__':
     unittest.main()
