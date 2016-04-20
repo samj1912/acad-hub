@@ -3,8 +3,7 @@ from webcrawler import showBooks
 from time import gmtime, strftime
 from exam import listTT
 from notes import uploadFile, listUploads, downloadFile ,rateFile
-from Tkinter import Tk
-from tkFileDialog import askopenfilename
+from bookLending import *
 import webbrowser
 
 def semFinder(roll): #simple function to parse the roll number and get sem
@@ -29,6 +28,10 @@ def displayResult(dept, sem, roll): #result display fuction
 	win.textBox.hide()
 	win.rating_combo.hide()
 	win.button_rating.hide()
+	win.button_lend.hide()
+	win.button_submit_lend.hide()
+	win.contact_field.hide()
+	win.button_delete.hide()
 	Gtk.main()
 
 
@@ -41,9 +44,10 @@ class MainNotebook(Gtk.Window):
 		# self.set_default_size(300, 300)
 		self.set_position(Gtk.WindowPosition.CENTER)
 		self.set_border_width(10)
-
+		WindowBox=Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 		self.notebook = Gtk.Notebook() #init. new notebook view
-		self.add(self.notebook)
+		WindowBox.pack_start(self.notebook,True,True,0)
+
 		self.notebook.set_scrollable(True)
 
 		courseBooks = showBooks(dept, sem) #getting an array of coursebooks and rel. info
@@ -209,18 +213,77 @@ class MainNotebook(Gtk.Window):
 		self.page4.pack_start(grid, True, True, 0)
 		self.notebook.append_page(self.page4, Gtk.Label('Notes'))
 
+
+		#Book lending platform
+		self.page5 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+		self.page5.set_border_width(10)
+		grid = Gtk.Grid(column_homogeneous=True, column_spacing=10, row_spacing=10)
+
+		self.lendingwindow = Gtk.ScrolledWindow()
+		self.lendingwindow.set_policy(Gtk.PolicyType.NEVER,
+									   Gtk.PolicyType.AUTOMATIC)
+
+		self.liststore_lend = Gtk.ListStore(str, str)
+
+		self.books_combo = Gtk.ComboBoxText()
+		self.books_combo.set_entry_text_column(0)
+		
+		self.books = courseBooks
+		self.roll = roll
+		self.activeLender = ""
+
+		self.course_combo2 = Gtk.ComboBoxText()
+		self.course_combo2.set_entry_text_column(0)
+		for course in self.courseList:
+			self.course_combo2.append_text(course)
+		self.course_combo2.connect('changed', self.on_course_combo2_changed)
+
+		self.course_combo2.set_active(0)
+		for book in self.books:
+			if book[1] == self.courseList[self.course_combo2.get_active()]:
+				self.books_combo.append_text(book[2])
+		self.books_combo.connect('changed', self.on_books_combo_changed)
+		self.books_combo.set_active(0)
+		lendButtonBox = Gtk.ButtonBox(Gtk.Orientation.HORIZONTAL)
+		lendButtonBox.set_layout(Gtk.ButtonBoxStyle.EDGE)
+
+		lendButtonBox.add(self.course_combo2)
+		lendButtonBox.add(self.books_combo)
+	
+		self.button_lend = Gtk.Button("Lend")
+		self.button_lend.connect("clicked", self.on_lend_clicked)
+		lendButtonBox.add(self.button_lend)
+
+		self.contact_field = Gtk.Entry()
+		lendButtonBox.add(self.contact_field)
+
+		self.button_submit_lend = Gtk.Button("Submit")
+		self.button_submit_lend.connect("clicked", self.on_submit_lend_clicked)
+		lendButtonBox.add(self.button_submit_lend)
+
+		self.button_delete = Gtk.Button("Delete")
+		self.button_delete.connect("clicked", self.on_delete_clicked)
+		lendButtonBox.add(self.button_delete)
+
+		self.updateLendList()
+		grid.attach(self.lendingwindow, 0, 0, 1, 1)
+		grid.attach_next_to(lendButtonBox, self.lendingwindow,
+								 Gtk.PositionType.BOTTOM, 1, 1)
+
+		self.page5.pack_start(grid, True, True, 0)
+		self.notebook.append_page(self.page5, Gtk.Label('Books Lend/Borrow'))
+
+		Logout = Gtk.Button(label="Logout")
+		Logout.connect("clicked", self.Logout) #button click event
+		WindowBox.pack_start(Logout,True,True,0)
+
+		self.add(WindowBox)
+
 	# def on_treeview_click(self, treeview, path, view_column):
  #        model=treeview.get_model()
  #        action_id=model[path][0]
  #        url='....' # build your url
  #        webbrowser.open(url)
- 	def on_treeview_click(self, treeview,path,view_column):
- 		model=treeview.get_model()
- 		action_id=model[path][0]
- 		url="https://www.google.com"
- 		webbrowser.open(url)
-
-
  	def on_rating_changed(self, widget):
  		pass	
  	def on_rating_submit(self,widget):
@@ -235,10 +298,92 @@ class MainNotebook(Gtk.Window):
  		self.updateFileList()
  		pass
 
+ 	def hideLending(self):
+ 		try:
+	 		self.button_lend.hide()
+	 		self.contact_field.hide()
+	 		self.button_submit_lend.hide()
+	 	except:
+	 		pass
+
+ 	def showLending(self):
+ 		try:
+	 		self.button_lend.show()
+	 		self.contact_field.hide()
+	 		self.button_submit_lend.hide()
+	 	except:
+	 		pass
+
+	def checkForDelete(self):
+		try:
+			if self.activeLender == self.roll:
+				self.button_delete.show()
+			else:
+				self.button_delete.hide()
+		except:
+			pass
+
+ 	def on_submit_lend_clicked(self, widget):
+ 		lendBook(self.roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+ 		self.updateLendList()
+ 		self.hideLending()
+
+ 	def on_lend_clicked(self, widget):
+ 		self.button_lend.hide()
+ 		self.contact_field.show()
+ 		self.button_submit_lend.show()
+
+ 	def on_delete_clicked(self, widget):
+ 		deleteLender(self.roll, self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+ 		self.updateLendList()
+
+	def on_treeview_click(self, treeview,path,view_column):
+		model=treeview.get_model()
+		action_id=model[path][0]
+		url="https://www.google.com"
+		webbrowser.open(url)
+
+
+ 	def Logout(self,widget):
+ 		fi=open('.info.txt','w+')
+ 		fi.close()
+ 		Gtk.main_quit()
+ 	
+
 	def on_course_combo_changed(self, combo):
 		self.updateFileList()
 		index = combo.get_active()
 		combo.set_active(index)
+
+	def on_course_combo2_changed(self, combo):
+		self.updateLendList()
+		self.books_combo.get_model().clear()
+		for book in self.books:
+			if book[1] == self.courseList[self.course_combo2.get_active()]:
+				self.books_combo.append_text(book[2])
+		self.books_combo.set_active(0)
+		index = combo.get_active()
+		combo.set_active(index)
+		try:
+			self.button_delete.hide()
+		except:
+			pass
+
+	def on_books_combo_changed(self, combo):
+		self.updateLendList()
+		index = combo.get_active()
+		combo.set_active(index)
+		try:
+			self.button_delete.hide()
+		except:
+			pass
+
+	def getSelectedLenderDetails(self, tree_selection):
+		(model, pathlist) = tree_selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = model.get_iter(path)
+			self.activeLender = model.get_value(tree_iter,0)
+		self.checkForDelete()
 
 	def on_download_clicked(self,widget):
 		dialog = Gtk.FileChooserDialog("Please choose a folder", self,
@@ -250,10 +395,7 @@ class MainNotebook(Gtk.Window):
 		if response == Gtk.ResponseType.OK:
 			location = dialog.get_filename()
 			activeCourse = self.courseList[self.course_combo.get_active()]
-			# filename, roll = self.getSelectedFileDetails()
-			# print filename,roll
 			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
-			# print self.activeFilename,location,self.activeRoll
 		dialog.destroy()
 		self.button_rating.show()
 		self.textBox.show()
@@ -369,20 +511,44 @@ class MainNotebook(Gtk.Window):
 
 		self.scrolledwindow.add_with_viewport(self.treeview)  
 
-	# def on_folder_clicked(self, widget):
-	#     dialog = Gtk.FileChooserDialog("Please choose a folder", self,
-	#         Gtk.FileChooserAction.SELECT_FOLDER,
-	#         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-	#          "Select", Gtk.ResponseType.OK))
-	#     dialog.set_default_size(800, 400)
 
-	#     response = dialog.run()
-	#     if response == Gtk.ResponseType.OK:
-	#         print("Select clicked")
-	#         print("Folder selected: " + dialog.get_filename())
-	#     elif response == Gtk.ResponseType.CANCEL:
-	#         print("Cancel clicked")
-	#     dialog.destroy()
+	def updateLendList(self):
+		rolls, contacts = listLenders(self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
+		self.liststore_lend.clear()
+		for roll,contact in zip(rolls,contacts):
+			self.liststore_lend.append([roll, contact])
+		
+		if self.roll in rolls or self.books_combo.get_active_text() is None:
+			self.hideLending()
+		else:
+			self.showLending()
+		
+		treeview = Gtk.TreeView(model=self.liststore_lend)
+		treeview.set_hexpand(True)
+		treeview.set_vexpand(True)
+
+		renderer_text = Gtk.CellRendererText(weight=600)
+		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
+		column_text = Gtk.TreeViewColumn('Roll number', renderer_text, text=0)
+		column_text.set_sort_column_id(1)
+		column_text.set_alignment(0.5)
+		treeview.append_column(column_text)
+
+		renderer_text = Gtk.CellRendererText(weight=600)
+		renderer_text.set_fixed_size(200, -1)
+		renderer_text.set_alignment(0.5,0.5)
+
+		column_text = Gtk.TreeViewColumn('Contact no.', renderer_text, text=1)
+		column_text.set_alignment(0.5)
+		treeview.append_column(column_text)
+
+		tree_selection = treeview.get_selection()
+		tree_selection.connect("changed", self.getSelectedLenderDetails)
+
+		self.lendingwindow.add_with_viewport(treeview)
+
 
 class MainBox(Gtk.Window):
 
@@ -390,8 +556,7 @@ class MainBox(Gtk.Window):
 		
 		Gtk.Window.__init__(self, title="SemBegins!") #main window
 		# self.set_default_size(200, 100) #setting default size
-		self.set_border_width(10)		
-
+		self.set_border_width(10)	
 		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 		label = Gtk.Label("Enter Your Roll Number:")
 		vbox.pack_start(label, True, True, 0)
@@ -400,11 +565,15 @@ class MainBox(Gtk.Window):
 		self.entry.set_max_length(9) 
 		self.entry.set_text("140101063") #default text value
 		vbox.pack_start(self.entry, True, True, 0)
+		fi.write(self.entry.get_text())
 
 		button = Gtk.Button(label="Submit")
 		button.connect("clicked", self.buttonClicked) #button click event
 		vbox.pack_start(button, True, True, 0)
 		self.add(vbox)
+		
+
+		
 
 	def buttonClicked(self, widget):
 		self.roll=self.entry.get_text()
@@ -412,7 +581,16 @@ class MainBox(Gtk.Window):
 		self.dept=depFinder(self.roll)
 		displayResult(self.dept, self.sem, self.roll)
 
-win = MainBox() #calling the mainbox
-win.connect("delete-event", Gtk.main_quit) #adding the quit event listener
-win.show_all()
-Gtk.main()
+
+fi=open(".info.txt",'r+')
+line=fi.readline()
+
+if line == '':
+	win = MainBox() #calling the mainbox
+	win.connect("delete-event", Gtk.main_quit) #adding the quit event listener
+	win.show_all()
+	Gtk.main()
+else:
+	displayResult(depFinder(line),semFinder(line),line)
+
+fi.close();

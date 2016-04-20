@@ -75,6 +75,4 @@ def downloadFile(filename, filepath, course, roll):
 		f.write(r.content)
 	print "Yayy!"	
 
-# downloadFile('EZ.txt', '/home/maulik/Desktop/test', 'CS203', '140101063')
-# listUploads("CS203")
-# uploadFile('exam.py')
+
