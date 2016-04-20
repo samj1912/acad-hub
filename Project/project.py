@@ -5,7 +5,7 @@ from notes import uploadFile, listUploads, downloadFile ,rateFile
 from bookLending import *
 import webbrowser
 from details import semFinder, depFinder
-
+from tools import sanitize_roll_number
 
 def stripAll(text):
 	strippedText = ''.join(text.split())
@@ -199,10 +199,6 @@ class MainNotebook(Gtk.Window):
 		button_download = Gtk.Button("Download")
 		button_download.connect("clicked", self.on_download_clicked)
 		buttonbox.add(button_download)
-
-		# tree_selection = self.treeview.get_selection()
-		# tree_selection.connect("changed", self.getSelectedFileDetails)
-		# tree_selection.connect("changed", self.checkForRating)
 
 		self.updateFileList()
 		grid.attach(self.scrolledwindow, 0, 0, 1, 1)
@@ -628,23 +624,29 @@ class MainBox(Gtk.Window):
 		
 		self.entry = Gtk.Entry() #entry box
 		self.entry.set_max_length(9) 
-		self.entry.set_text("140101001") #default text value
 		vbox.pack_start(self.entry, True, True, 0)
-		fi.write(self.entry.get_text())
 
 		button = Gtk.Button(label="Submit")
 		button.connect("clicked", self.buttonClicked) #button click event
 		vbox.pack_start(button, True, True, 0)
+
+		self.label = Gtk.Label("Please Enter valid roll number")
+		vbox.pack_start(self.label, True, True, 0)
 		self.add(vbox)
 		
-		fi.close()
 		
 
 	def buttonClicked(self, widget):
 		self.roll=self.entry.get_text()
-		self.sem=semFinder(self.roll)
-		self.dept=depFinder(self.roll)
-		displayResult(self.dept, self.sem, self.roll)
+		if sanitize_roll_number(self.roll):
+			self.sem=semFinder(self.roll)
+			self.dept=depFinder(self.roll)
+			self.label.hide()
+			fi.write(self.entry.get_text())
+			fi.close()
+			displayResult(self.dept, self.sem, self.roll)
+		else:
+			self.label.show()
 
 
 fi=open(".info.txt",'r+')
@@ -655,6 +657,7 @@ if line == '':
 	win = MainBox() #calling the mainbox
 	win.connect("delete-event", Gtk.main_quit) #adding the quit event listener
 	win.show_all()
+	win.label.hide()
 	Gtk.main()
 else:
 	fi.close()
