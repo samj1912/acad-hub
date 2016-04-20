@@ -17,6 +17,7 @@ def displayResult(dept, sem, roll): #result display fuction
 	win.connect("delete-event", Gtk.main_quit)
 	win.show_all()
 	win.textBox.hide()
+	win.downloadBox.hide()
 	win.rating_combo.hide()
 	win.button_rating.hide()
 	win.button_lend.hide()
@@ -29,6 +30,7 @@ def displayResult(dept, sem, roll): #result display fuction
 class MainNotebook(Gtk.Window):
 
 	def __init__(self,dept="CSE",sem=3,roll='140101063'):
+
 		Gtk.Window.__init__(self, title="Acad-Hub")
 		# self.set_resizable(True)
 		# self.maximize()
@@ -174,8 +176,10 @@ class MainNotebook(Gtk.Window):
 
 		buttonbox = Gtk.ButtonBox(Gtk.Orientation.HORIZONTAL)
 		buttonbox.set_layout(Gtk.ButtonBoxStyle.EDGE)
+		self.downloadBox=Gtk.Label("Download Succesful.")
 		self.textBox = Gtk.Label("Rating For the File:")
 		buttonbox.add(self.course_combo)
+		buttonbox.add(self.downloadBox)
 		buttonbox.add(self.textBox)
 		buttonbox.add(self.rating_combo)
 
@@ -285,6 +289,7 @@ class MainNotebook(Gtk.Window):
  		fd.seek(0,0)
  		self.button_rating.hide()
  		self.textBox.hide()
+ 		self.downloadBox.hide()
  		self.rating_combo.hide()
  		self.textBox.set_text("Rating For the File:")
  		notes=fd.readlines()
@@ -430,7 +435,13 @@ class MainNotebook(Gtk.Window):
 				self.textBox.show()
 				self.rating_combo.show()
 				
-			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll, self.rating)
+			code=downloadFile(self.activeFilename,location,activeCourse,self.activeRoll, self.rating)
+
+			if code==200:
+				self.downloadBox.show()
+			else:
+				self.downloadBox.set_text("Error Downloading")
+				self.downloadBox.show()	
 
 		dialog.destroy()
 
