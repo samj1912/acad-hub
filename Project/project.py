@@ -6,6 +6,11 @@ from notes import uploadFile, listUploads, downloadFile ,rateFile
 from bookLending import *
 import webbrowser
 
+
+def stripAll(text):
+	strippedText = ''.join(text.split())
+	return strippedText
+
 def semFinder(roll): #simple function to parse the roll number and get sem
 	a=str(roll)
 	year=a[0:2]
@@ -205,6 +210,10 @@ class MainNotebook(Gtk.Window):
 		button_download.connect("clicked", self.on_download_clicked)
 		buttonbox.add(button_download)
 
+		tree_selection = self.treeview.get_selection()
+		tree_selection.connect("changed", self.getSelectedFileDetails)
+		tree_selection.connect("changed", self.checkForRating)
+
 		self.updateFileList()
 		grid.attach(self.scrolledwindow, 0, 0, 1, 1)
 		grid.attach_next_to(buttonbox, self.scrolledwindow,
@@ -213,7 +222,7 @@ class MainNotebook(Gtk.Window):
 		self.page4.pack_start(grid, True, True, 0)
 		self.notebook.append_page(self.page4, Gtk.Label('Notes'))
 
-
+		
 		#Book lending platform
 		self.page5 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 		self.page5.set_border_width(10)
@@ -279,20 +288,46 @@ class MainNotebook(Gtk.Window):
 
 		self.add(WindowBox)
 
+
  	def Logout(self,widget):
  		fi=open('.info.txt','w+')
  		fi.close()
  		Gtk.main_quit()
  		self.destroy()
 
+ 	def checkForRating(self,widget):
+ 		fd.seek(0,0)
+ 		self.button_rating.hide()
+ 		self.textBox.hide()
+ 		self.rating_combo.hide()
+ 		notes=fd.readlines()
+ 		for line in notes:
+ 			# print line
+ 			# print stripAll(self.activeFilename + " " + self.courseList[self.course_combo.get_active()] + " " + self.activeRoll + " " + self.uploadTime + "0")
+ 			if stripAll(line) == stripAll(self.activeFilename + " " + self.courseList[self.course_combo.get_active()] + " " + self.activeRoll + " " + self.uploadTime + "0"):
+ 				self.button_rating.show()
+ 				self.textBox.show()
+ 				self.rating_combo.show()
+
+
  	def on_rating_changed(self, widget):
  		pass	
  	def on_rating_submit(self,widget):
- 		
  		activeCourse = self.courseList[self.course_combo.get_active()]
  		ratingnew = self.rating_combo.get_active()+1
  		print ratingnew
  		rateFile(self.activeFilename,activeCourse,self.activeRoll, self.rating,ratingnew)
+ 		fd.seek(0,0)
+ 		start=0
+ 		line=fd.readline()
+ 		while line != '':
+ 			if line==stripAll(self.activeFilename + " " + self.courseList[self.course_combo.get_active()] + " " + self.activeRoll + " " + self.uploadTime + "0"):
+ 				fd.seek(start,0)
+ 				fd.write(line[:-1]+str(ratingnew))
+
+ 			start=fd.tell()
+ 			line=fd.readline()
+
  		self.button_rating.hide()
  		self.rating_combo.hide()
  		self.textBox.set_text("Thanks for your rating!")
@@ -337,12 +372,6 @@ class MainNotebook(Gtk.Window):
  	def on_delete_clicked(self, widget):
  		deleteLender(self.roll, self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
  		self.updateLendList()
-
-	def on_treeview_click(self, treeview,path,view_column):
-		model=treeview.get_model()
-		action_id=model[path][0]
-		url="https://www.google.com"
-		webbrowser.open(url)
 
 
  	def Logout(self,widget):
@@ -397,10 +426,13 @@ class MainNotebook(Gtk.Window):
 			location = dialog.get_filename()
 			activeCourse = self.courseList[self.course_combo.get_active()]
 			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
+			self.activeRating=0
+			fd.write(stripAll(self.activeFilename + " " + activeCourse + " " + self.activeRoll + " " + self.uploadTime + " " + str(self.activeRating))+"\n")
 		dialog.destroy()
 		self.button_rating.show()
 		self.textBox.show()
 		self.rating_combo.show()
+		
 
 
 	def on_upload_clicked(self, widget,roll):
@@ -451,6 +483,7 @@ class MainNotebook(Gtk.Window):
 			self.activeFilename = model.get_value(tree_iter,1)
 			self.activeRoll = model.get_value(tree_iter,2)
 			self.rating = model.get_value(tree_iter,3)
+			self.uploadTime = model.get_value(tree_iter,4)
 
 
 	def updateFileList(self):
@@ -601,6 +634,7 @@ class MainBox(Gtk.Window):
 
 fi=open(".info.txt",'r+')
 line=fi.readline()
+fd=open(".download.txt", "a+")
 
 if line == '':
 	win = MainBox() #calling the mainbox
@@ -608,5 +642,6 @@ if line == '':
 	win.show_all()
 	Gtk.main()
 else:
-	displayResult(depFinder(line),semFinder(line),line)
 	fi.close()
+	displayResult(depFinder(line),semFinder(line),line)
+	
