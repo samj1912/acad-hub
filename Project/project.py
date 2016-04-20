@@ -416,16 +416,24 @@ class MainNotebook(Gtk.Window):
 		if response == Gtk.ResponseType.OK:
 			location = dialog.get_filename()
 			activeCourse = self.courseList[self.course_combo.get_active()]
-			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll)
 			self.activeRating=0
-			fd.seek(0,2)
-			fd.write(stripAll(self.activeFilename + " " + activeCourse + " " + self.activeRoll + " " + self.uploadTime + " " + str(self.activeRating))+"\n")
+			fd.seek(0,0)
+			flag=0
+			notes=fd.readlines()
+			for line in notes:
+				if stripAll(line[:-2])==stripAll(self.activeFilename + " " + activeCourse + " " + self.activeRoll + " " + self.uploadTime):
+					flag=1
+			if flag==0:
+				fd.seek(0,2)
+				fd.write(stripAll(self.activeFilename + " " + activeCourse + " " + self.activeRoll + " " + self.uploadTime + " " + str(self.activeRating))+"\n")
+				self.button_rating.show()
+				self.textBox.show()
+				self.rating_combo.show()
+				
 			downloadFile(self.activeFilename,location,activeCourse,self.activeRoll, self.rating)
 
 		dialog.destroy()
-		self.button_rating.show()
-		self.textBox.show()
-		self.rating_combo.show()
+
 		
 
 
