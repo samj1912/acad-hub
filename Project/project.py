@@ -632,21 +632,47 @@ class MainBox(Gtk.Window):
 		
 		Gtk.Window.__init__(self, title="SemBegins!") #main window
 		# self.set_default_size(200, 100) #setting default size
-		self.set_border_width(10)	
+		self.set_border_width(10)
+		self.set_size_request(100,100)
+		self.set_default_size(100,100)
+		self.set_position(Gtk.WindowPosition.CENTER)
+		self.set_resizable(False)
 		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 		label = Gtk.Label("Enter Your Roll Number:")
 		vbox.pack_start(label, True, True, 0)
 		
+		entryBox=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6)
+		leftBox=Gtk.Box()
+		entryBox.pack_start(leftBox,True,True,0)
 		self.entry = Gtk.Entry() #entry box
 		self.entry.set_max_length(9) 
-		vbox.pack_start(self.entry, True, True, 0)
+		entryBox.pack_start(self.entry,True,True,0)
+		RightBox=Gtk.Box()
+		entryBox.pack_start(RightBox,True,True,0)
+		vbox.pack_start(entryBox, False, False, 0)
 
+		stupidBox=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6)
+		stupidBox.pack_start(leftBox,True,True,0)
 		button = Gtk.Button(label="Submit")
 		button.connect("clicked", self.buttonClicked) #button click event
-		vbox.pack_start(button, True, True, 0)
+		button.set_size_request(20,20)
+		stupidBox.pack_start(button, False, False, 0)
+		stupidBox.pack_start(RightBox,True,True,0)
+		vbox.pack_start(stupidBox,True,True,0)
+
 
 		self.label = Gtk.Label("Please Enter valid roll number")
 		vbox.pack_start(self.label, True, True, 0)
+
+		self.DisclaimerLabel=Gtk.Label("Disclaimer:")
+		self.DisclaimerLabel.set_alignment(0,0.5)
+		vbox.pack_start(self.DisclaimerLabel, True, True, 0)
+
+		self.Disclaimer=Gtk.TextView()
+		self.Disclaimer.get_buffer().insert_at_cursor("The links are being provided as a convenience and for informational purposes only; they do not constitute an\n endorsement or an approval by the Acad-Hub of any of the products, services or opinions of the corporation or\n organization or individual. The Acad-Hub team bears no responsibility for the accuracy, legality or content of\n the external site or for that of subsequent links.")
+		self.Disclaimer.set_editable(False)
+		self.Disclaimer.set_cursor_visible(False)
+		vbox.pack_start(self.Disclaimer,False,False,0)	
 		self.add(vbox)
 		
 		
