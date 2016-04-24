@@ -2,9 +2,15 @@ import requests
 from bs4 import BeautifulSoup as bs
 
 def splitAndJoin(text):
+	"""Function that returns a string formed after replacing all the white spaces of the given input string(text) with a single space
+	"""
 	return " ".join(text.split()).rstrip().lstrip()
 
 def libgenSearch(book):
+	"""Function that returns the libgen download link for a given book. 
+	Input is a list of length 2 with first entry as book name and second as author
+	If not found, string "None" is returned.
+	"""
 	return "None" #returning none for now, below is the main function
 	# return "https://www.google.com"
 	name = book[0] #getting the name of the book
@@ -40,6 +46,10 @@ def libgenSearch(book):
 	return "http://libgen.io"+link['href'] #returning the final link
 
 def librarySearch(book):
+	"""Function that returns the IITG library location for a given book. 
+	Input is a list of length 2 with first entry as book name and second as author.
+	If not found, string "None" is returned.
+	"""
 	return "None"
 	name = book[0]
 	author = book[1]

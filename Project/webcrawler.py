@@ -3,24 +3,30 @@ from bs4 import BeautifulSoup
 from libSearch import libgenSearch, librarySearch
 import string 
 
-# Function to get rid of all the white spaces in the text
 def stripAll(text):
+	"""Function that returns a string formed after removing all the white spaces in the text
+	"""
 	strippedText = ''.join(text.split())
 	return strippedText
-# Function to first split the string of all the white spaces and 
-# then join the splitted list with a space
+
 def splitAndJoin(text):
+	"""Function that returns a string formed after replacing all the white spaces of the given input string(text) with a single space
+	"""
 	return " ".join(text.split()).rstrip().lstrip()
 
-# remove punctuations and "and" from the book name or author name
 def removePunc(text):
+	"""Function that returns a string formed after removing punctuations and "and" in the text
+	"""
 	for c in string.punctuation:
 		if c is not '.':
 			text = text.replace(c, "")
 	return text.replace(" and ", " ")
 
-# For searching in institute library, get only the first author
+
 def getFirstAuthor(text):
+	"""For searching in institute library, get only the first author.
+	Given a string containing all the authors of a book, function returns only the first author.
+	"""
 	if "," in text:
 		authors = text.split(",")
 		author = splitAndJoin(authors[0])
@@ -38,9 +44,13 @@ def getFirstAuthor(text):
 	return " ".join(temp2)
 
 
-# given a row that contains info about some course, 
-# return the relevant rows of the table that contain all that course's books and reference texts
+
 def getBooks(row):
+	"""Given a row that contains info about some course, 
+	function returns the relevant rows of the table that contain all that course's books and reference texts
+	Input is a soup object containing a row of a HTML table.
+	Returns a pair of lists. First item of the pair contains list of books in the given row and second item contains the list of references.
+	"""
 	para = row.findAll('p')
 
 	bookPos = len(para)
@@ -66,9 +76,14 @@ def getBooks(row):
 			ref.append(para[i])
 	return (books, ref)
 
-# get all the books for the courses in the courses list and their authors, publications, 
-# library search and download link
+
 def getCourseBooks(courses, soup):
+	"""Function to get all the books for the courses in the courses list along with their authors, publications, library search and download link
+	Input is a course list and a Beautiful soup object.
+	Returns a list of tuples. Every tuple contains course, course code, title of book, author, publications, library location and download link.
+	"""
+
+
 	# Table that contains detailed course info on the intranet page
 	tables = soup.findAll('table', {'class':'MsoTableGrid'}) 
 	rows = []
@@ -114,11 +129,11 @@ def getCourseBooks(courses, soup):
 
 
 
-
-
-# Function that parses all the courses and their info and return a list of all 
-# the books in the relevant courses by calling the function getcourseBooks
 def showBooks(dept, sem, find="books"):
+	"""	if find is "courses", function returns info of courses as per to the given department and semester. 
+	Returns a dictionary(with course names as keys) of dictionaries(with course codes,L,T,P,C as keys)
+	if find is "books", function returns a list of all books with their info as returned from getCourseBooks function.
+	"""
 	sem = int(sem)
 	if dept=="bdes":
 		url= "http://shilloi.iitg.ernet.in/~acad/intranet/CourseStructure/bdes2013onwards.htm"

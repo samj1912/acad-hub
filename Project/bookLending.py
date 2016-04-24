@@ -2,12 +2,17 @@ import requests
 
 
 def lendBook(roll, contact, course, book):
+	"""Function that completes the lending process of a book.
+	Takes input the roll number, contact number, course and book and stores the info on the database
+	"""
 	url = 'http://172.16.115.76/lendbook.php'
 	data = {'roll':roll, 'contact':contact, 'course':course, 'book':book}
 	r = requests.post(url, data=data)
 
 
 def listLenders(course, book):
+	"""Function to return the roll number and contact number of all the lenders of a given book
+	"""
 	url = 'http://172.16.115.76/listlenders.php'
 	data = {'course':course, 'book':book}
 	r = requests.post(url, data=data)
@@ -21,6 +26,8 @@ def listLenders(course, book):
 	return rolls, contacts
 
 def deleteLender(roll, course, book):
+	"""Function to remove the entry from the lenders database
+	"""
 	url = 'http://172.16.115.76/deletelenders.php'
 	data = {'course':course, 'book':book, 'roll':roll}
 	r = requests.post(url, data=data)

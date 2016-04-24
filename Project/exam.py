@@ -3,20 +3,17 @@ from bs4 import BeautifulSoup
 from webcrawler import showBooks
 
 
-#functions to remove spaces as desired
 def sortfunc(a):
 	return int(a[1])
-def stripAll(text):
-	strippedText = ''.join(text.split())
-	return strippedText
+
 
 def splitAndJoin(text):
+	"""Function that returns a string formed after replacing all the white spaces of the given input string(text) with a single space
+	"""
 	return " ".join(text.split()).rstrip().lstrip()
 
-def removeSpaces(text):
-	return "".join(text.split()).rstrip().lstrip()
 
-#function to get date from the first column
+
 def getDate(rows,j):
 	ans=rows[j].find('td')			#getting text of the first column of the row
 	b=splitAndJoin(ans.text)

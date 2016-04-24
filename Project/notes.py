@@ -3,6 +3,9 @@ import os
 import time
 
 def uploadFile(file, roll, course):
+	"""Function to upload a given file to the server.
+	Input is file location, roll number and course.
+	"""
 	url = 'http://172.16.115.76/upload.php'
 	files = {'fileToUpload': open(file, 'rb')}
 	data = {'roll':roll, 'course':course}
@@ -10,6 +13,8 @@ def uploadFile(file, roll, course):
 	return r.status_code	
 
 def listUploads(course):
+	"""Function to list all the uploaded notes for a given inpur course
+	"""
 	url = 'http://172.16.115.76/listfiles.php'
 	data = {'course':course}
 	r = requests.post(url, data=data)
@@ -45,6 +50,10 @@ def listUploads(course):
 
 
 def rateFile(filename, course, roll,ratingold, ratingnew):
+	"""Function to rate a given file. 
+	Updates the rating of the given file by taking inputs as the filename, course, roll number(of the uploader), 
+	old rating and the selected rating by the user.
+	"""
 	url = 'http://172.16.115.76/rating.php'
 	print ratingold
 	rato = float(ratingold[0:4])
@@ -60,6 +69,9 @@ def rateFile(filename, course, roll,ratingold, ratingnew):
 
 
 def downloadFile(filename, filepath, course, roll,rating):
+	"""Function to download a given file from the server.
+	Input is filename, location(where to be downloaded), course, roll number and rating of the file.
+	"""
 	url = 'http://172.16.115.76/download.php'
 	rate = "_"+rating[0:4]+"_"+rating[5:-1]
 	data = {'course':course, 'file':filename, 'roll':roll,'rating':rate}
