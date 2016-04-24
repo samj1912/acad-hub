@@ -630,7 +630,7 @@ class MainBox(Gtk.Window):
 
 	def __init__(self):
 		
-		Gtk.Window.__init__(self, title="SemBegins!") #main window
+		Gtk.Window.__init__(self, title="Acad-Hub!") #main window
 		# self.set_default_size(200, 100) #setting default size
 		self.set_border_width(10)
 		self.set_size_request(100,100)
@@ -638,8 +638,11 @@ class MainBox(Gtk.Window):
 		self.set_position(Gtk.WindowPosition.CENTER)
 		self.set_resizable(False)
 		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+		self.v2box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+		self.v3box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+
 		label = Gtk.Label("Enter Your Roll Number:")
-		vbox.pack_start(label, True, True, 0)
+		self.v2box.pack_start(label, True, True, 0)
 		
 		entryBox=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6)
 		leftBox=Gtk.Box()
@@ -649,7 +652,7 @@ class MainBox(Gtk.Window):
 		entryBox.pack_start(self.entry,False,False,0)
 		RightBox=Gtk.Box()
 		entryBox.pack_start(RightBox,True,True,0)
-		vbox.pack_start(entryBox, False, False, 0)
+		self.v2box.pack_start(entryBox, False, False, 0)
 
 		stupidBox=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6)
 		lbox=Gtk.Box()
@@ -660,24 +663,46 @@ class MainBox(Gtk.Window):
 		stupidBox.pack_start(button, False, False, 0)
 		rbox=Gtk.Box()
 		stupidBox.pack_start(rbox,True,True,0)
-		vbox.pack_start(stupidBox,True,True,0)
+		self.v2box.pack_start(stupidBox,True,True,0)
 
 
 		self.label = Gtk.Label("Please Enter valid roll number")
-		vbox.pack_start(self.label, True, True, 0)
-
+		self.v2box.pack_start(self.label, True, True, 0)
+		
 		self.DisclaimerLabel=Gtk.Label("Disclaimer:")
 		self.DisclaimerLabel.set_alignment(0,0.5)
-		vbox.pack_start(self.DisclaimerLabel, True, True, 0)
+		self.v3box.pack_start(self.DisclaimerLabel, True, True, 0)
 
 		self.Disclaimer=Gtk.TextView()
-		self.Disclaimer.get_buffer().insert_at_cursor("The links are being provided as a convenience and for informational purposes only; they do not constitute an\n endorsement or an approval by the Acad-Hub of any of the products, services or opinions of the corporation or\n organization or individual. The Acad-Hub team bears no responsibility for the accuracy, legality or content of\n the external site or for that of subsequent links.")
+		self.Disclaimer.set_left_margin(20)
+		self.Disclaimer.set_right_margin(20)
+		self.Disclaimer.get_buffer().insert_at_cursor("\nThe links are being provided as a convenience and for informational purposes only; they do not constitute an\n endorsement or an approval by the Acad-Hub of any of the products, services or opinions of the corporation or\n organization or individual. The Acad-Hub team bears no responsibility for the accuracy, legality or content of\n the external site or for that of subsequent links.\n")
 		self.Disclaimer.set_editable(False)
 		self.Disclaimer.set_cursor_visible(False)
-		vbox.pack_start(self.Disclaimer,False,False,0)	
+		self.v3box.pack_start(self.Disclaimer,False,False,0)
+
+		hBox=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6)
+		self.acceptButton=Gtk.Button(label="Accept")
+		self.acceptButton.connect("clicked", self.acceptButtonClicked)
+		hBox.pack_start(self.acceptButton,True,True,0)
+
+		self.declineButton=Gtk.Button(label="Decline")
+		self.declineButton.connect("clicked", Gtk.main_quit)
+		hBox.pack_start(self.declineButton,True,True,0)
+		
+		self.v3box.pack_start(hBox,True,True,0)
+
+		vbox.pack_start(self.v2box,True,True,0)
+		vbox.pack_start(self.v3box,True,True,0)
+
 		self.add(vbox)
 		
 		
+	def acceptButtonClicked(self,widget):
+		self.v3box.hide()
+		self.v2box.show()
+	
+
 
 	def buttonClicked(self, widget):
 		self.roll=self.entry.get_text()
@@ -700,6 +725,7 @@ if line == '':
 	win = MainBox() #calling the mainbox
 	win.connect("delete-event", Gtk.main_quit) #adding the quit event listener
 	win.show_all()
+	win.v2box.hide()
 	win.label.hide()
 	Gtk.main()
 else:
