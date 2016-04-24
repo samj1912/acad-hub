@@ -669,7 +669,8 @@ class MainBox(Gtk.Window):
 		self.label = Gtk.Label("Please Enter valid roll number")
 		self.v2box.pack_start(self.label, True, True, 0)
 		
-		self.DisclaimerLabel=Gtk.Label("Disclaimer:")
+		self.DisclaimerLabel=Gtk.Label()
+		self.DisclaimerLabel.set_markup("<b>Disclaimer: </b>")
 		self.DisclaimerLabel.set_alignment(0,0.5)
 		self.v3box.pack_start(self.DisclaimerLabel, True, True, 0)
 
