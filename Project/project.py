@@ -646,18 +646,20 @@ class MainBox(Gtk.Window):
 		entryBox.pack_start(leftBox,True,True,0)
 		self.entry = Gtk.Entry() #entry box
 		self.entry.set_max_length(9) 
-		entryBox.pack_start(self.entry,True,True,0)
+		entryBox.pack_start(self.entry,False,False,0)
 		RightBox=Gtk.Box()
 		entryBox.pack_start(RightBox,True,True,0)
 		vbox.pack_start(entryBox, False, False, 0)
 
 		stupidBox=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=6)
-		stupidBox.pack_start(leftBox,True,True,0)
+		lbox=Gtk.Box()
+		stupidBox.pack_start(lbox,True,True,0)
 		button = Gtk.Button(label="Submit")
 		button.connect("clicked", self.buttonClicked) #button click event
 		button.set_size_request(20,20)
 		stupidBox.pack_start(button, False, False, 0)
-		stupidBox.pack_start(RightBox,True,True,0)
+		rbox=Gtk.Box()
+		stupidBox.pack_start(rbox,True,True,0)
 		vbox.pack_start(stupidBox,True,True,0)
 
 
