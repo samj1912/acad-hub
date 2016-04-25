@@ -1,6 +1,14 @@
+"""@package docstring
+Documentation for this module.
+
+This module has functions to upload, list and download files. 
+"""
+
 import requests
 import os
 import time
+
+
 
 def uploadFile(file, roll, course):
 	"""Function to upload a given file to the server.

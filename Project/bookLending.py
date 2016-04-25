@@ -1,3 +1,9 @@
+"""@package docstring
+Documentation for this module.
+
+This module has functions to fetch and update book lenders' list.
+"""
+
 import requests
 
 

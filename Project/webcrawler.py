@@ -1,3 +1,9 @@
+"""@package docstring
+Documentation for this module.
+
+This module has functions to fetch book details.
+"""
+
 import requests
 from bs4 import BeautifulSoup
 from libSearch import libgenSearch, librarySearch

@@ -1,3 +1,8 @@
+"""@package docstring
+Documentation for this module.
+
+This module has functions to find the semester and department from roll number.
+"""
 from time import gmtime, strftime
 
 def semFinder(roll): 
