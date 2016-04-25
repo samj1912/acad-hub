@@ -1,3 +1,8 @@
+"""@package docstring
+Documentation for this module.
+
+A Module to fetch the exam time table of the student
+"""
 import requests
 from bs4 import BeautifulSoup
 from webcrawler import showBooks
@@ -15,6 +20,9 @@ def splitAndJoin(text):
 
 
 def getDate(rows,j):
+	"""
+	A method to get the date of the exam
+	"""
 	ans=rows[j].find('td')			#getting text of the first column of the row
 	b=splitAndJoin(ans.text)
 	a=b.split()						#splitting text by spaces
@@ -22,6 +30,9 @@ def getDate(rows,j):
 
 #function to find date
 def findDate(rows,i):
+	"""
+	A method to iterate through the columns and get to the column date
+	"""
 	j=i
 	while j>0:						#iterating backward through the rows
 		if 'Day' in rows[j].text:	#checking i day is present in the row's text
@@ -31,6 +42,9 @@ def findDate(rows,i):
 
 #function to find the room of the course exam
 def getRoom(course,rows,i):
+	"""
+	A method that gets the room allocated for the particular exam
+	"""
 	columns=rows[i].findAll('td')			#finding all columns in that particular row
 	
 	for i in range(len(columns)):			#iterating through all columns
@@ -43,6 +57,9 @@ def getRoom(course,rows,i):
 
 
 def examtt(courses):
+	"""
+	A method to extract the exam time table of various courses in the course list
+	"""
 	url = "http://shilloi.iitg.ernet.in/~acad/intranet/tt/ett.htm"
 	source_code = requests.get(url)
 	plain_text = source_code.text
@@ -76,6 +93,9 @@ def examtt(courses):
 
 
 def listTT(dept,sem):
+	"""
+	A method that returns the exam time table the courses in the specified format
+	"""
 	courses = showBooks(dept, sem,"courses") #gets courses of the dep and sem from the webcrawler file
 
 	coursecodes = []

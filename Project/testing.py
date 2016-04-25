@@ -1,3 +1,9 @@
+"""@package docstring
+Documentation for this module.
+
+Testing Module
+"""
+
 import unittest
 from details import semFinder, depFinder
 from notes import *

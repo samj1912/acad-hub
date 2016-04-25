@@ -1,3 +1,8 @@
+"""@package docstring
+Documentation for this module.
+Main Window Module
+"""
+
 from gi.repository import Gtk, GObject, GdkPixbuf
 from webcrawler import showBooks
 from exam import listTT
@@ -8,11 +13,17 @@ from details import semFinder, depFinder
 from tools import sanitize_roll_number, sanitize_phone_number
 
 def stripAll(text):
+	"""
+	A function to strip all text
+	"""
 	strippedText = ''.join(text.split())
 	return strippedText
 
 
 def displayResult(dept, sem, roll): #result display fuction
+	"""
+	A function to display the main window to display results
+	"""
 	win = MainNotebook(dept,sem,roll) #calling notebookview
 	win.connect("delete-event", Gtk.main_quit)
 	win.show_all()
@@ -29,8 +40,14 @@ def displayResult(dept, sem, roll): #result display fuction
 
 
 class MainNotebook(Gtk.Window):
+	"""
+	The Main Notebook that displays all the results
+	"""
 
 	def __init__(self,dept="CSE",sem=3,roll='140101063'):
+		"""
+		Initalizes Notebook with 5 pages 
+		"""
 
 		Gtk.Window.__init__(self, title="Acad-Hub")
 		# self.set_resizable(True)
@@ -45,60 +62,25 @@ class MainNotebook(Gtk.Window):
 		self.notebook.set_scrollable(True)
 
 		courseBooks = showBooks(dept, sem) #getting an array of coursebooks and rel. info
-		self.page1 = Gtk.Box() 
-		self.page1.set_border_width(10)
-		books_list_store = Gtk.ListStore(str, str, str, str, str, str,str) #new liststore for books
-		for book in courseBooks:
-			books_list_store.append(list(book))
-
-		books_tree_view = Gtk.TreeView(books_list_store) #adding to treeview
 	
+			#adding books page
+		self.page1 = Gtk.Box()
+		self.page1.set_border_width(10)
+		courses= showBooks(dept,sem,"courses") #fetching course info and credits
+		course_list_store = Gtk.ListStore(str, str, str, str, str , str)
+		for course in courses:
+			course_list_store.append(list(course))
+		course_tree_view = Gtk.TreeView(course_list_store)
 
-		#adding columns
-		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability"]):
+		for i, col_title in enumerate(["Course-Code", "Course Name", "L", "T", "P" , "C"]):
 			renderer = Gtk.CellRendererText()
-			renderer.set_fixed_size(-1,50)
-			renderer.set_property('editable', True)
-			
+
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
-			column.add_attribute(renderer, "markup", i) 
-			if i!=1:
-				column.set_max_width(250)
-				column.set_resizable(True)
-				column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-				column.set_fixed_width(150)
-			# column.set_sort_column_id(i) #allowing sortable columns
-			books_tree_view.append_column(column) 
-		
+			column.set_sort_column_id(i)
+			course_tree_view.append_column(column)
 
-		
-
-		self.page1.pack_start(books_tree_view, True, True, 0)
-
-		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-
-
-
-		padding_box=Gtk.Box()
-		padding_box.set_size_request(20,20)
-		vbox.pack_start(padding_box, False, False, 0)
-
-
-		for book in courseBooks:
-			if book[6]=="None":
-				button = Gtk.LinkButton(book[6],label="Not Available")
-				button.set_size_request(20,54)
-				vbox.pack_start(button, False, False, 0)
-			else:
-				button = Gtk.LinkButton(book[6],label="Download")
-				button.set_size_request(20,54)
-				vbox.pack_start(button, False, False, 0)
-
-		self.page1.pack_start(vbox,False,False,0)
-
-		self.notebook.append_page(self.page1, Gtk.Label('Books Info'))
-		#adding books page
-
+		self.page1.pack_start(course_tree_view, True, True, 0)
+		self.notebook.append_page(self.page1, Gtk.Label('Course Information'))
 		self.page2 = Gtk.Box()
 		self.page2.set_border_width(10)
 		examtt= listTT(dept,sem) #fetching exam time table array
@@ -122,23 +104,58 @@ class MainNotebook(Gtk.Window):
 
 		#adding exam time table
 
-		self.page3 = Gtk.Box()
+		self.page3 = Gtk.Box() 
 		self.page3.set_border_width(10)
-		courses= showBooks(dept,sem,"courses") #fetching course info and credits
-		course_list_store = Gtk.ListStore(str, str, str, str, str , str)
-		for course in courses:
-			course_list_store.append(list(course))
-		course_tree_view = Gtk.TreeView(course_list_store)
+		books_list_store = Gtk.ListStore(str, str, str, str, str, str,str) #new liststore for books
+		for book in courseBooks:
+			books_list_store.append(list(book))
 
-		for i, col_title in enumerate(["Course-Code", "Course Name", "L", "T", "P" , "C"]):
+		books_tree_view = Gtk.TreeView(books_list_store) #adding to treeview
+
+
+		#adding columns
+		for i, col_title in enumerate(["Course", "Code", "Title", "Author", "Publications/Edition", "Library Availability"]):
 			renderer = Gtk.CellRendererText()
-
+			renderer.set_fixed_size(-1,50)
+			renderer.set_property('editable', True)
+			
 			column = Gtk.TreeViewColumn(col_title, renderer, text=i)
-			column.set_sort_column_id(i)
-			course_tree_view.append_column(column)
+			column.add_attribute(renderer, "markup", i) 
+			if i!=1:
+				column.set_max_width(300)
+				column.set_resizable(True)
+				column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+				column.set_fixed_width(150)
+			# column.set_sort_column_id(i) #allowing sortable columns
+			books_tree_view.append_column(column) 
 
-		self.page3.pack_start(course_tree_view, True, True, 0)
-		self.notebook.append_page(self.page3, Gtk.Label('Course Information'))
+
+
+
+		self.page3.pack_start(books_tree_view, True, True, 0)
+
+		vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+
+
+
+		padding_box=Gtk.Box()
+		padding_box.set_size_request(20,20)
+		vbox.pack_start(padding_box, False, False, 0)
+
+
+		for book in courseBooks:
+			if book[6]=="None":
+				button = Gtk.LinkButton(book[6],label="Not Available")
+				button.set_size_request(20,54)
+				vbox.pack_start(button, False, False, 0)
+			else:
+				button = Gtk.LinkButton(book[6],label="Download")
+				button.set_size_request(20,54)
+				vbox.pack_start(button, False, False, 0)
+
+		self.page3.pack_start(vbox,False,False,0)
+
+		self.notebook.append_page(self.page3, Gtk.Label('Books Info'))
 		#adding the course page to notebook view
 
 		self.page4 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
@@ -159,7 +176,8 @@ class MainNotebook(Gtk.Window):
 		self.activeRoll = ""
 		self.rating = ""
 		for course in courses:
-			self.courseList.append(str(course[0]))
+			if course[0] != "":
+				self.courseList.append(str(course[0]))
 		for course in self.courseList:
 			self.course_combo.append_text(course)
 		self.course_combo.connect('changed', self.on_course_combo_changed)
@@ -284,12 +302,18 @@ class MainNotebook(Gtk.Window):
 
 
  	def Logout(self,widget):
+ 		"""
+ 			A method to logout of the current session
+ 		"""
  		fi=open('.info.txt','w+')
  		fi.close()
  		Gtk.main_quit()
  		self.destroy()
 
  	def checkForRating(self,widget):
+ 		"""
+ 			A method to retrieve the active rating of the person
+ 		"""
  		fd.seek(0,0)
  		self.button_rating.hide()
  		self.textBox.hide()
@@ -312,6 +336,9 @@ class MainNotebook(Gtk.Window):
  	def on_rating_changed(self, widget):
  		pass	
  	def on_rating_submit(self,widget):
+ 		"""
+ 		A method to save the rating of the person on pressing the submit button
+ 		"""
  		activeCourse = self.courseList[self.course_combo.get_active()]
  		ratingnew = self.rating_combo.get_active()+1
  		print ratingnew
@@ -335,6 +362,9 @@ class MainNotebook(Gtk.Window):
  		pass
 
  	def hideLending(self):
+ 		"""
+ 		A method to hide lending buttons on lending once
+ 		"""
  		try:
 	 		self.button_lend.hide()
 	 		self.contact_field.hide()
@@ -344,6 +374,9 @@ class MainNotebook(Gtk.Window):
 	 		pass
 
  	def showLending(self):
+ 		"""
+ 		A method to show the lending buttons on course change
+ 		"""
  		try:
 	 		self.button_lend.show()
 	 		self.contact_label.hide()
@@ -353,6 +386,9 @@ class MainNotebook(Gtk.Window):
 	 		pass
 
 	def checkForDelete(self):
+		"""
+ 		A method to check if the person has already lended the book
+ 		"""
 		try:
 			if self.activeLender == self.roll:
 				self.button_delete.show()
@@ -362,6 +398,9 @@ class MainNotebook(Gtk.Window):
 			pass
 
  	def on_submit_lend_clicked(self, widget):
+ 		"""
+ 		A method that aids in lending the book
+ 		"""
  		if sanitize_phone_number(self.contact_field.get_text()):		
 	 		self.contact_label.set_text("Enter your phone number")
 	 		lendBook(self.roll, self.contact_field.get_text(), self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
@@ -371,29 +410,35 @@ class MainNotebook(Gtk.Window):
 	 		self.contact_label.set_text("Please enter valid phone number")
 
  	def on_lend_clicked(self, widget):
+ 		"""
+ 		A method to hide and show various buttons when the lend button is clicked
+ 		"""
  		self.button_lend.hide()
  		self.contact_label.show()
  		self.contact_field.show()
  		self.button_submit_lend.show()
 
  	def on_delete_clicked(self, widget):
+ 		"""
+ 		A method to delete the lended book entry on deleting
+ 		"""
  		deleteLender(self.roll, self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
  		self.button_delete.hide()
  		self.updateLendList()
-
-
- 	def Logout(self,widget):
- 		fi=open('.info.txt','w+')
- 		fi.close()
- 		Gtk.main_quit()
  	
 
 	def on_course_combo_changed(self, combo):
+		"""
+ 		A method to call update note list when course combo list is changed in the notes tab
+ 		"""
 		self.updateFileList()
 		index = combo.get_active()
 		combo.set_active(index)
 
 	def on_course_combo2_changed(self, combo):
+		"""
+ 		A method to call update lender list when course combo list is changed in the book lending tab 
+ 		"""
 		self.updateLendList()
 		self.books_combo.get_model().clear()
 		for book in self.books:
@@ -408,6 +453,9 @@ class MainNotebook(Gtk.Window):
 			pass
 
 	def on_books_combo_changed(self, combo):
+		"""
+ 		A method to call update lender list when books combo list is changed in the book lending tab 
+ 		"""
 		self.updateLendList()
 		index = combo.get_active()
 		combo.set_active(index)
@@ -417,6 +465,9 @@ class MainNotebook(Gtk.Window):
 			pass
 
 	def getSelectedLenderDetails(self, tree_selection):
+		"""
+ 		A method to get the details of the selected lender
+ 		"""
 		(model, pathlist) = tree_selection.get_selected_rows()
 		for path in pathlist:
 			tree_iter = model.get_iter(path)
@@ -424,6 +475,9 @@ class MainNotebook(Gtk.Window):
 		self.checkForDelete()
 
 	def on_download_clicked(self,widget):
+		"""
+ 		A method to call the method to download the file when download button is clicked
+ 		"""
 		dialog = Gtk.FileChooserDialog("Please choose a folder", self,
 			Gtk.FileChooserAction.SELECT_FOLDER,
 			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -461,6 +515,9 @@ class MainNotebook(Gtk.Window):
 
 
 	def on_upload_clicked(self, widget,roll):
+		"""
+ 		A method to call the upload method when upload button is clicked
+ 		"""
 		try:
 			if self.fileToUpload != "":
 				index = self.course_combo.get_active()
@@ -471,6 +528,9 @@ class MainNotebook(Gtk.Window):
 			pass
 
 	def on_file_clicked(self, widget):
+		"""
+ 		A method to choose a file 
+ 		"""
 		dialog = Gtk.FileChooserDialog("Please choose a file", self,
 			Gtk.FileChooserAction.OPEN,
 			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -485,6 +545,14 @@ class MainNotebook(Gtk.Window):
 
 
 	def add_filters(self, dialog):
+		"""
+ 		A method to filter the filetypes that has to be chosen
+ 		"""
+ 		filter_any = Gtk.FileFilter()
+ 		filter_any.set_name("Any files")
+ 		filter_any.add_pattern("*")
+ 		dialog.add_filter(filter_any)
+
 		filter_text = Gtk.FileFilter()
 		filter_text.set_name("Text files")
 		filter_text.add_mime_type("text/plain")
@@ -495,13 +563,12 @@ class MainNotebook(Gtk.Window):
 		filter_py.add_mime_type("text/x-python")
 		dialog.add_filter(filter_py)
 
-		filter_any = Gtk.FileFilter()
-		filter_any.set_name("Any files")
-		filter_any.add_pattern("*")
-		dialog.add_filter(filter_any)
-
+		
 
 	def getSelectedFileDetails(self, tree_selection):
+		"""
+ 		A method to get the file details of the selected file
+ 		"""
 		(model, pathlist) = tree_selection.get_selected_rows()
 		for path in pathlist:
 			tree_iter = model.get_iter(path)
@@ -512,6 +579,9 @@ class MainNotebook(Gtk.Window):
 
 
 	def updateFileList(self):
+		"""
+ 		A method to update the file list on various event listeners
+ 		"""
 		pics_list,pics_name,uploader_list,upload_time ,rating = listUploads(self.courseList[self.course_combo.get_active()])
 		self.liststore_files.clear()
 		for name, pic, uploader, time , rating in zip(pics_name, pics_list, uploader_list, upload_time ,rating):
@@ -570,25 +640,15 @@ class MainNotebook(Gtk.Window):
 		tree_selection.connect("changed", self.checkForRating)
 
 		self.scrolledwindow.add_with_viewport(self.treeview)
-	# def on_folder_clicked(self, widget):
-	#     dialog = Gtk.FileChooserDialog("Please choose a folder", self,
-	#         Gtk.FileChooserAction.SELECT_FOLDER,
-	#         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-	#          "Select", Gtk.ResponseType.OK))
-	#     dialog.set_default_size(800, 400)
-
-	#     response = dialog.run()
-	#     if response == Gtk.ResponseType.OK:
-	#         print("Select clicked")
-	#         print("Folder selected: " + dialog.get_filename())
-	#     elif response == Gtk.ResponseType.CANCEL:
-	#         print("Cancel clicked")
-	#     dialog.destroy()
+	
 
 		self.scrolledwindow.add_with_viewport(self.treeview)  
 
 
 	def updateLendList(self):
+		"""
+ 		A method to update the lend list on various event listeners
+ 		"""
 		rolls, contacts = listLenders(self.courseList[self.course_combo2.get_active()], self.books_combo.get_active_text())
 		self.liststore_lend.clear()
 		for roll,contact in zip(rolls,contacts):
@@ -628,7 +688,11 @@ class MainNotebook(Gtk.Window):
 
 class MainBox(Gtk.Window):
 
+	"""
+	The Main Box that displays the first box takes roll number entry and displays the Main window
+	"""
 	def __init__(self):
+
 		
 		Gtk.Window.__init__(self, title="Acad-Hub!") #main window
 		# self.set_default_size(200, 100) #setting default size
@@ -700,12 +764,18 @@ class MainBox(Gtk.Window):
 		
 		
 	def acceptButtonClicked(self,widget):
+		"""
+ 		A method called when the disclaimer is accepted
+ 		"""
 		self.v3box.hide()
 		self.v2box.show()
 	
 
 
 	def buttonClicked(self, widget):
+		"""
+ 		A method to call the main window when submit is pressed
+ 		"""
 		self.roll=self.entry.get_text()
 		if sanitize_roll_number(self.roll):
 			self.sem=semFinder(self.roll)

@@ -1,11 +1,17 @@
+"""@package docstring
+Documentation for this module.
+
+This module has functions to sanitize inputs
+"""
+
 def sanitize_roll_number(roll):
 	"""Function to check if the entered string is a valid roll number.
 	"""
 	validYears = ['12', '13', '14', '15']
-	validDeps = ["01", "02", "03", "04", "05", "06", "07", "08", "21", "22", "23"]
+	validDeps = ["0101", "0102", "0103", "0104", "0205", "0106", "0107", "0108", "0121", "0122", "0123"]
 	if len(roll) == 9 and roll.isdigit():
 		if roll[:2] in validYears:
-			if roll[4:6] in validDeps:
+			if roll[2:6] in validDeps:
 				return True
 	return False
 
